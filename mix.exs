@@ -53,7 +53,8 @@ defmodule TransmissionManager.MixProject do
       {:plug_cowboy, "~> 2.5"},
       {:transmission, "~> 0.1.0"},
       {:poolboy, "~> 1.5.1"},
-      {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false}
+      {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
+      {:credo, "~> 1.6", only: [:dev, :test], runtime: false}
       # {:transmission, git: "https://github.com/m1dnight/ex_transmission"}
     ]
   end

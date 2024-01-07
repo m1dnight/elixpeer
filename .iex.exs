@@ -1,0 +1,4 @@
+alias TransmissionManager.Rule
+alias TransmissionManager.Torrent
+alias TransmissionManager.Cleaner
+alias TransmissionManager.TransmissionConnection

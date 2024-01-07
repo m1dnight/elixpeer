@@ -15,7 +15,7 @@ defmodule TransmissionManager.Torrent do
           :uploadRatio => float(),
           :uploadedEver => any(),
           :activityDate => integer(),
-          optional(any()) => any(),
+          optional(any()) => any()
         }
 
   @type t :: %__MODULE__{

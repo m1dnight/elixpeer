@@ -1,26 +1,38 @@
 defmodule TransmissionManager.Cleaner do
   alias TransmissionManager.Rule
   alias TransmissionManager.Torrent
+  alias TransmissionManager.TransmissionConnection
+
+  require Logger
 
   @dry_run Application.compile_env(:transmission_cleaner, :dry_run, true)
+
+  def clean_torrents() do
+    torrents = TransmissionConnection.get_torrents()
+    to_delete = matching_torrents(torrents, rules())
+
+    for torrent <- to_delete do
+      Logger.info("deleting torrent: #{torrent}")
+
+      unless @dry_run do
+        Transmission.remove_torrent(Transmission, torrent.id, true)
+      end
+    end
+
+    {:ok, to_delete}
+  end
 
   @doc """
   Given a torrent and a rule, checks if the torrent matches the rule.
   """
   def matching_torrents(torrents, rules) do
     torrents
-    |> Enum.map(fn torrent ->
-      matching_rules =
-        Enum.filter(rules, fn rule ->
-          Rule.match?(rule, torrent)
-        end)
+    |> Enum.filter(&matches_rules?(&1, rules))
+  end
 
-      {torrent, matching_rules}
-    end)
-    |> Enum.filter(fn
-      {_, []} -> false
-      _ -> true
-    end)
+  def matches_rules?(torrent, rules) do
+    rules
+    |> Enum.all?(&Rule.match?(&1, torrent))
   end
 
   def matching_torrents_pretty(torrents, rules) do
@@ -32,16 +44,17 @@ defmodule TransmissionManager.Cleaner do
       #{Enum.join(matching_rules, "\n")}
       """
     end)
+    |> IO.puts()
   end
 
   # basic rules
   def rules do
     [
       %Rule{
-        name: "older than 50 days",
+        name: "older than 40 days",
         rule: fn torrent ->
-          month_ago = DateTime.utc_now() |> DateTime.add(50 * -1, :day)
-          DateTime.before?(torrent.added_date, month_ago)
+          cutoff = DateTime.utc_now() |> DateTime.add(40 * -1, :day)
+          DateTime.before?(torrent.added_date, cutoff)
         end,
         action: :delete,
         enabled: true
@@ -55,10 +68,10 @@ defmodule TransmissionManager.Cleaner do
         enabled: true
       },
       %Rule{
-        name: "inactive for 10 days",
+        name: "inactive for 7 days",
         rule: fn torrent ->
-          month_ago = DateTime.utc_now() |> DateTime.add(10 * -1, :day)
-          DateTime.before?(torrent.activity_date, month_ago)
+          cutoff = DateTime.utc_now() |> DateTime.add(7 * -1, :day)
+          DateTime.before?(torrent.activity_date, cutoff)
         end,
         action: :delete,
         enabled: true
