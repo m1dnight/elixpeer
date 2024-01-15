@@ -86,13 +86,13 @@ config :logger, :console,
   format: "$time $metadata[$level] $message\n",
   metadata: [:request_id]
 
-config :logger,
-  compile_time_purge_matching: [
-    [application: Tesla],
-    [module: Tesla.Middleware.Logger, level_lower_than: :error]
-  ]
+# config :logger,
+#   compile_time_purge_matching: [
+#     [application: Tesla],
+#     [module: Tesla.Middleware.Logger, level_lower_than: :error]
+#   ]
 
-config :tesla, Tesla.Middleware.Logger, debug: false, log_level: :info
+# config :tesla, Tesla.Middleware.Logger, debug: false, log_level: :info
 
 #############################################################################
 # Others

@@ -1,4 +1,7 @@
 defmodule TransmissionManager.Torrent do
+  @moduledoc """
+  Model of a transmission torrent.
+  """
   alias __MODULE__
 
   # type of the json dictionary coming from the Transmission api

@@ -1,7 +1,11 @@
 defmodule TransmissionManager.Rule do
+  @moduledoc """
+  A rule for cleaning up torrents.
+
+  """
   alias TransmissionManager.Torrent
 
-  @type rule :: (Torrent.t() -> boolean())
+  @type rule :: (Torrent.t() -> boolean()) | rule
   @type action :: :delete | :ignore
   @type t :: %__MODULE__{
           :name => String.t(),

@@ -134,10 +134,7 @@ defmodule TransmissionManagerWeb.TorrentsLive do
 
     torrents = order_torrents(torrents, order)
 
-    IO.inspect(order, label: "order")
     socket = assign(socket, torrents: torrents)
-
-    IO.inspect(hd(socket.assigns.torrents).name)
 
     socket
   end

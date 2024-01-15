@@ -1,4 +1,9 @@
 defmodule TransmissionManager.TransmissionConnection do
+  @moduledoc """
+  The connection to the remote transmission instance.
+
+  Keeps a current list of torrents in memory and periodically updates it via the API.
+  """
   use GenServer
   alias TransmissionManager.Torrent
 
@@ -12,7 +17,6 @@ defmodule TransmissionManager.TransmissionConnection do
   def init(state) do
     # start the transmission api
     {:ok, pid} = apply(Transmission, :start_link, transmission_arguments())
-    Process.register(pid, Transmission)
 
     # Schedule work to be performed on start
     schedule_sync(0)
@@ -55,7 +59,7 @@ defmodule TransmissionManager.TransmissionConnection do
   # Helpers
 
   defp get_torrents_from_transmission() do
-    Transmission.get_torrents(Transmission)
+    Transmission.get_torrents()
     |> Enum.map(&Torrent.new/1)
   end
 
@@ -73,7 +77,7 @@ defmodule TransmissionManager.TransmissionConnection do
     ]
 
     args
-    |> Enum.map(fn arg ->
+    |> Enum.each(fn arg ->
       case arg do
         nil -> raise "Missing transmission argument"
         "" -> raise "Missing transmission argument"
@@ -81,7 +85,6 @@ defmodule TransmissionManager.TransmissionConnection do
       end
     end)
 
-    IO.inspect(args)
     args
   end
 end

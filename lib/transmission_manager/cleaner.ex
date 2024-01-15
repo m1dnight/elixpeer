@@ -1,6 +1,10 @@
 defmodule TransmissionManager.Cleaner do
+  @moduledoc """
+  The cleaner is responsible for cleaning up the torrents.
+
+  Given a set of rules, all torrents that match any of the rules will be deleted.
+  """
   alias TransmissionManager.Rule
-  alias TransmissionManager.Torrent
   alias TransmissionManager.TransmissionConnection
 
   require Logger
@@ -15,7 +19,7 @@ defmodule TransmissionManager.Cleaner do
       Logger.info("deleting torrent: #{torrent}")
 
       unless @dry_run do
-        Transmission.remove_torrent(Transmission, torrent.id, true)
+        Transmission.remove_torrent(torrent.id, true)
       end
     end
 
@@ -53,7 +57,7 @@ defmodule TransmissionManager.Cleaner do
       %Rule{
         name: "older than 40 days",
         rule: fn torrent ->
-          cutoff = DateTime.utc_now() |> DateTime.add(40 * -1, :day)
+          cutoff = DateTime.utc_now() |> DateTime.add(10 * -1, :day)
           DateTime.before?(torrent.added_date, cutoff)
         end,
         action: :delete,
@@ -70,7 +74,7 @@ defmodule TransmissionManager.Cleaner do
       %Rule{
         name: "inactive for 7 days",
         rule: fn torrent ->
-          cutoff = DateTime.utc_now() |> DateTime.add(7 * -1, :day)
+          cutoff = DateTime.utc_now() |> DateTime.add(5 * -1, :day)
           DateTime.before?(torrent.activity_date, cutoff)
         end,
         action: :delete,
