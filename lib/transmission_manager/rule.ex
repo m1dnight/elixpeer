@@ -5,7 +5,7 @@ defmodule TransmissionManager.Rule do
   """
   alias TransmissionManager.Torrent
 
-  @type rule :: (Torrent.t() -> boolean()) | rule
+  @type rule :: (Torrent.t() -> boolean()) | [rule]
   @type action :: :delete | :ignore
   @type t :: %__MODULE__{
           :name => String.t(),
@@ -29,8 +29,13 @@ defmodule TransmissionManager.Rule do
   end
 
   @spec match?(t(), Torrent.t()) :: boolean()
-  def match?(rule, torrent) do
+  def match?(rule, torrent) when is_function(rule.rule) do
     rule.rule.(torrent)
+  end
+
+  def match?(rule, torrent) when is_list(rule.rule) do
+    rule.rule
+    |> Enum.all?(&__MODULE__.match?(&1, torrent))
   end
 end
 
