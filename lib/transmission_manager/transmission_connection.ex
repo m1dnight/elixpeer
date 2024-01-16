@@ -16,7 +16,7 @@ defmodule TransmissionManager.TransmissionConnection do
   @impl true
   def init(state) do
     # start the transmission api
-    {:ok, pid} = apply(Transmission, :start_link, transmission_arguments())
+    {:ok, _pid} = apply(Transmission, :start_link, transmission_arguments())
 
     # Schedule work to be performed on start
     schedule_sync(0)

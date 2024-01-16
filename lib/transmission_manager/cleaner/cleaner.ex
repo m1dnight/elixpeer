@@ -17,13 +17,13 @@ defmodule TransmissionManager.Cleaner do
     torrents = TransmissionConnection.get_torrents()
     to_delete = matching_torrents(torrents, rules())
 
-    for {torrent, _rules} <- to_delete do
-      Logger.info("deleting torrent: #{torrent}")
+    for {torrent, matching_rules} <- to_delete do
+      Logger.info(
+        "deleting '#{torrent.name}' (#{torrent.id}) because: #{Enum.join(matching_rules, ", ")}"
+      )
 
-      if dryrun?() do
-        Logger.info("dry run, not deleting torrent")
-      else
-        Transmission.remove_torrent(torrent.id, true)
+      unless dryrun?() do
+        # Transmission.remove_torrent(torrent.id, true)
       end
     end
 
@@ -117,7 +117,7 @@ defmodule TransmissionManager.Cleaner do
           }
         ],
         action: :delete,
-        enabled: true
+        enabled: false
       },
       %Rule{
         name: "downloaded 50 days ago, but never seeded a byte",
@@ -147,7 +147,13 @@ defmodule TransmissionManager.Cleaner do
           }
         ],
         action: :delete,
-        enabled: true
+        enabled: false
+      },
+      %Rule{
+        name: "debug rule",
+        rule: fn _ -> true end,
+        action: :ignore,
+        enabled: false
       }
     ]
   end

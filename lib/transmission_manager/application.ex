@@ -24,7 +24,8 @@ defmodule TransmissionManager.Application do
         start:
           {TransmissionManager.TransmissionConnection, :start_link,
            [[], [name: TransmissionManager.TransmissionConnection]]}
-      }
+      },
+      TransmissionManager.Cleaner.Worker
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

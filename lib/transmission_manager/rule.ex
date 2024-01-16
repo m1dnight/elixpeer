@@ -29,6 +29,8 @@ defmodule TransmissionManager.Rule do
   end
 
   @spec match?(t(), Torrent.t()) :: boolean()
+  def match?(%{enabled: false}, _torrent), do: false
+
   def match?(rule, torrent) when is_function(rule.rule) do
     rule.rule.(torrent)
   end
