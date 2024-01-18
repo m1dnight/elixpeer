@@ -87,7 +87,7 @@ defmodule TransmissionManager.Cleaner do
   defp rules do
     [
       %Rule{
-        name: "40 days old, seeded for 1+ ratio, inactive for 7 days",
+        name: "40 days old, seeded for 1+ ratio, inactive for 7 days, not redacted",
         rule: [
           %Rule{
             name: "older than 40 days",
@@ -102,6 +102,16 @@ defmodule TransmissionManager.Cleaner do
             name: "seeded for 1+ ratio",
             rule: fn torrent ->
               torrent.upload_ratio > 1.0
+            end,
+            action: :delete,
+            enabled: true
+          },
+          %Rule{
+            name: "exclude torrents from redacted",
+            rule: fn torrent ->
+              torrent.trackers
+              |> Enum.any?(fn tracker -> tracker.announce =~ "flacsfor.me" end)
+              |> Kernel.!()
             end,
             action: :delete,
             enabled: true
@@ -122,6 +132,16 @@ defmodule TransmissionManager.Cleaner do
       %Rule{
         name: "downloaded 50 days ago, but never seeded a byte",
         rule: [
+          %Rule{
+            name: "exclude torrents from redacted",
+            rule: fn torrent ->
+              torrent.trackers
+              |> Enum.any?(fn tracker -> tracker.announce =~ "flacsfor.me" end)
+              |> Kernel.!()
+            end,
+            action: :delete,
+            enabled: true
+          },
           %Rule{
             name: "older than 50 days",
             rule: fn torrent ->

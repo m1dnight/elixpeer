@@ -1,9 +1,33 @@
+defmodule TransmissionManager.Tracker do
+  @moduledoc """
+  Model of a transmission tracker.
+  """
+  alias __MODULE__
+
+  @type t :: %__MODULE__{
+          :id => integer(),
+          :announce => String.t(),
+          :scrape => String.t(),
+          :tier => integer(),
+          :sitename => String.t()
+        }
+  @keys [
+    :id,
+    :announce,
+    :scrape,
+    :tier,
+    :sitename
+  ]
+  @enforce_keys @keys
+  defstruct @keys
+end
+
 defmodule TransmissionManager.Torrent do
   @moduledoc """
   Model of a transmission torrent.
   """
   alias __MODULE__
-
+  alias TransmissionManager.Tracker
   # type of the json dictionary coming from the Transmission api
   @type torrent_map :: %{
           :addedDate => integer(),
@@ -18,6 +42,15 @@ defmodule TransmissionManager.Torrent do
           :uploadRatio => float(),
           :uploadedEver => any(),
           :activityDate => integer(),
+          :trackers => [
+            %{
+              :id => integer(),
+              :announce => String.t(),
+              :scrape => String.t(),
+              :tier => integer(),
+              :sitename => String.t()
+            }
+          ],
           optional(any()) => any()
         }
 
@@ -41,7 +74,8 @@ defmodule TransmissionManager.Torrent do
             | :queued_to_download
             | :downloading
             | :queued_to_seed
-            | :seeding
+            | :seeding,
+          :trackers => [Tracker.t()]
         }
   @keys [
     :name,
@@ -56,7 +90,8 @@ defmodule TransmissionManager.Torrent do
     :percent_done,
     :uploaded,
     :downloaded,
-    :status
+    :status,
+    :trackers
   ]
   @enforce_keys @keys
   defstruct @keys
@@ -64,16 +99,6 @@ defmodule TransmissionManager.Torrent do
   @spec new(torrent_map()) :: t()
   def new(torrent_map) do
     # https://github.com/transmission/transmission/blob/main/docs/rpc-spec.md
-    status =
-      case torrent_map.status do
-        0 -> :stopped
-        1 -> :queued_to_verify
-        2 -> :verifying
-        3 -> :queued_to_download
-        4 -> :downloading
-        5 -> :queued_to_seed
-        6 -> :seeding
-      end
 
     %Torrent{
       id: torrent_map.id,
@@ -87,9 +112,35 @@ defmodule TransmissionManager.Torrent do
       percent_done: torrent_map.percentDone * 100,
       uploaded: torrent_map.uploadedEver,
       downloaded: torrent_map.downloadedEver,
-      status: status,
-      activity_date: DateTime.from_unix!(torrent_map.activityDate)
+      status: parse_status(torrent_map),
+      activity_date: DateTime.from_unix!(torrent_map.activityDate),
+      trackers: parse_trackers(torrent_map)
     }
+  end
+
+  defp parse_status(torrent_map) do
+    case torrent_map.status do
+      0 -> :stopped
+      1 -> :queued_to_verify
+      2 -> :verifying
+      3 -> :queued_to_download
+      4 -> :downloading
+      5 -> :queued_to_seed
+      6 -> :seeding
+    end
+  end
+
+  defp parse_trackers(torrent_map) do
+    torrent_map.trackers
+    |> Enum.map(fn tracker ->
+      %Tracker{
+        id: tracker.id,
+        announce: tracker.announce,
+        scrape: tracker.scrape,
+        tier: tracker.tier,
+        sitename: tracker.sitename
+      }
+    end)
   end
 end
 

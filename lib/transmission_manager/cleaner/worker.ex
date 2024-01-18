@@ -1,4 +1,7 @@
 defmodule TransmissionManager.Cleaner.Worker do
+  @moduledoc """
+  Worker to periodically clean up torrents.
+  """
   use GenServer
   require Logger
   @clean_rate_ms Application.compile_env(:transmission_manager, :clean_rate_ms, 60_000)
