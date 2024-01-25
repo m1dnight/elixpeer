@@ -36,7 +36,7 @@ defmodule TransmissionManager.Cleaner do
   def clean_torrents_pretty() do
     torrents = TransmissionConnection.get_torrents()
 
-    torrents
+    cleanable = torrents
     |> matching_torrents(rules())
     |> Enum.filter(fn {_, matching_rules} -> matching_rules != [] end)
     |> Enum.map(fn {torrent, matching_rules} ->
@@ -45,7 +45,12 @@ defmodule TransmissionManager.Cleaner do
         reason: #{Enum.join(matching_rules, "\n")}
       """
     end)
-    |> IO.puts()
+    |> tap(&IO.puts/1)
+
+    """
+    Checked #{Enum.count(torrents)}, #{Enum.count(cleanable)} torrents matched.
+    """
+    |> IO.puts
   end
 
   @spec match_torrents([Torrent.t()], [Rule.t()]) :: [{Torrent.t(), [Rule.t()]}]

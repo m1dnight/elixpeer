@@ -17,7 +17,7 @@ config :transmission_manager,
     password: System.get_env("TRANSMISSION_PASSWORD"),
     host: System.get_env("TRANSMISSION_HOST")
   },
-  refresh_rate_ms: 60_000,
+  refresh_rate_ms: 500,
   # refresh_rate_ms: 500,
   clean_rate_ms: 10_000,
   dry_run: true,

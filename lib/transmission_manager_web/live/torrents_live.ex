@@ -68,6 +68,20 @@ defmodule TransmissionManagerWeb.TorrentsLive do
           Active First
         </label>
       </div>
+      <div class="flex items-center me-4">
+        <input
+          checked={@ordering == :ratio_desc}
+          id="inline-radio"
+          type="radio"
+          value="order_active_first"
+          name="inline-radio-group"
+          phx-click="order_ratio_desc"
+          class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+        />
+        <label for="inline-radio" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+          Sort by ratio
+        </label>
+      </div>
     </div>
     <!-- Torrentlist -->
     <div class="grid grid-cols-1 gap-1">
@@ -83,28 +97,14 @@ defmodule TransmissionManagerWeb.TorrentsLive do
     {:noreply, socket}
   end
 
-  def handle_event("order_active_first", _, socket) do
+  def handle_event("order_" <> order, _, socket) do
+    order =
+      order
+      |> String.to_existing_atom()
+
     socket =
       socket
-      |> assign(:ordering, :active_first)
-      |> apply_ordering()
-
-    {:noreply, socket}
-  end
-
-  def handle_event("order_oldest_first", _, socket) do
-    socket =
-      socket
-      |> assign(:ordering, :oldest_first)
-      |> apply_ordering()
-
-    {:noreply, socket}
-  end
-
-  def handle_event("order_newest_first", _, socket) do
-    socket =
-      socket
-      |> assign(:ordering, :newest_first)
+      |> assign(:ordering, order)
       |> apply_ordering()
 
     {:noreply, socket}
@@ -137,6 +137,11 @@ defmodule TransmissionManagerWeb.TorrentsLive do
     socket = assign(socket, torrents: torrents)
 
     socket
+  end
+
+  defp order_torrents(torrents, :ratio_desc) do
+    torrents
+    |> Enum.sort_by(&(&1.upload_ratio), :desc)
   end
 
   defp order_torrents(torrents, :active_first) do
