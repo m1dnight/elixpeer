@@ -9,7 +9,7 @@ defmodule TransmissionManager.Application do
   def start(_type, _args) do
     children = [
       TransmissionManagerWeb.Telemetry,
-      TransmissionManager.Repo,
+      # TransmissionManager.Repo,
       {DNSCluster,
        query: Application.get_env(:transmission_manager, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: TransmissionManager.PubSub},

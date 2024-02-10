@@ -148,9 +148,9 @@ defmodule TransmissionManager.Cleaner do
             enabled: true
           },
           %Rule{
-            name: "older than 50 days",
+            name: "older than 40 days",
             rule: fn torrent ->
-              cutoff = DateTime.utc_now() |> DateTime.add(50 * -1, :day)
+              cutoff = DateTime.utc_now() |> DateTime.add(40 * -1, :day)
               DateTime.before?(torrent.added_date, cutoff)
             end,
             action: :delete,
