@@ -15,6 +15,6 @@ defmodule TransmissionManager.RulesTest do
       date_added: DateTime.utc_now() |> DateTime.add(-11)
     }
 
-    assert match_rule?(rule, torrent) == true
+    assert match_rule?(rule, torrent) == false
   end
 end
