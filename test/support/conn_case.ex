@@ -32,7 +32,7 @@ defmodule TransmissionManagerWeb.ConnCase do
   end
 
   setup tags do
-    TransmissionManager.DataCase.setup_sandbox(tags)
+    # TransmissionManager.DataCase.setup_sandbox(tags)
     {:ok, conn: Phoenix.ConnTest.build_conn()}
   end
 end

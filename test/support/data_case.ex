@@ -28,7 +28,7 @@ defmodule TransmissionManager.DataCase do
   end
 
   setup tags do
-    TransmissionManager.DataCase.setup_sandbox(tags)
+    # TransmissionManager.DataCase.setup_sandbox(tags)
     :ok
   end
 
