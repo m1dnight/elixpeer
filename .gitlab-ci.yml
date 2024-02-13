@@ -29,8 +29,6 @@ compile:
     - mix local.rebar --force
   image: ${ELIXIR_IMAGE}
   stage: build
-  tags:
-    - loomy-be
   script:
     - apt-get update && apt-get -y install postgresql-client
     - mix deps.get
