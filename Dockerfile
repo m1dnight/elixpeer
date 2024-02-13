@@ -1,6 +1,6 @@
 ################################################################################
 # Build Image
-FROM elixir:1.16-slim as build
+FROM elixir:1.16-otp-25 as build
 LABEL maintainer "Christophe De Troyer <christophe@call-cc.be>"
 
 # Install compile-time dependencies
@@ -31,7 +31,7 @@ RUN mix release
 ################################################################################
 # Release Image
 
-FROM elixir:1.16-slim AS app
+FROM elixir:1.16-otp-25 AS app
 
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y openssl postgresql-client locales libssl-dev
 
