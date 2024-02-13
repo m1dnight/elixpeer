@@ -1,0 +1,24 @@
+version: "3.1"
+
+
+services:
+  data-api:
+    image: registry.gitlab.com/loomy-hq/data-api:${BRANCH}
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=ecto://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}/${POSTGRES_DB}
+      - SECRET_KEY_BASE=${SECRET_KEY_BASE}
+      - DEBUG=info
+      - PHX_SERVER=true
+      - AVERAGE_WINDOW_MS=${AVERAGE_WINDOW_MS}
+      - STDDEV_THRESHOLD=${STDDEV_THRESHOLD}
+      - MEAN_THRESHOLD=${MEAN_THRESHOLD}
+      - MQTT_HOST=${MQTT_HOST}
+      - MQTT_PORT=${MQTT_PORT}
+      - MQTT_CLIENT_ID=${MQTT_CLIENT_ID}
+      - PHX_HOST=${DATA_API_DOMAIN}
+      - DASHBOARD_HOST=${DATA_API_DASHBOARD_DOMAIN}
+    volumes:
+      - ./.volumes/data-api/cert:/app/cert
+    ports:
+      - 127.0.0.1:4000:4000

@@ -1,0 +1,78 @@
+variables:
+  DOCKER_DRIVER: overlay2
+  # Create the certificates inside this directory for both the server
+  # and client. The certificates used by the client will be created in
+  # /certs/client so we only need to share this directory with the
+  # volume mount in `config.toml`.
+  DOCKER_TLS_CERTDIR: "/certs"
+  # POSTGRES_DB: "test${MIX_TEST_PARTITION}"
+  # POSTGRES_HOST: postgres
+  # POSTGRES_USER: postgres
+  # POSTGRES_PASSWORD: "postgres"
+  MIX_ENV: "test"
+  ELIXIR_IMAGE: "elixir:1.16-otp-25"
+
+stages:
+  - build
+  - test
+  - docker
+  - deploy
+
+cache:
+  paths:
+    - _build
+    - deps
+
+compile:
+  before_script:
+    - mix local.hex --force
+    - mix local.rebar --force
+  image: ${ELIXIR_IMAGE}
+  stage: build
+  tags:
+    - loomy-be
+  script:
+    - apt-get update && apt-get -y install postgresql-client
+    - mix deps.get
+    - mix compile --warnings-as-errors
+
+test:
+  before_script:
+    - mix local.hex --force
+    - mix local.rebar --force
+    - mix deps.get
+  # services:
+  #   - postgres:latest
+  image:  ${ELIXIR_IMAGE}
+  stage: test
+  tags:
+    - loomy.be
+  script:
+    # - mix ecto.create
+    # - mix ecto.migrate
+    - mix test
+
+lint:
+  before_script:
+    - mix local.hex --force
+    - mix local.rebar --force
+  image:  ${ELIXIR_IMAGE}
+  stage: test
+  script:
+    - mix deps.get
+    - mix format --check-formatted
+    - mix credo
+
+dockerbuild:
+  services:
+    - docker:dind
+  image: docker
+  stage: docker
+  script:
+    - echo $CI_REGISTRY
+    - echo $CI_REGISTRY_USER
+    - docker login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY};
+    - docker build --tag $CI_REGISTRY_IMAGE:latest .
+    - docker tag $CI_REGISTRY_IMAGE:latest $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH
+    - docker push $CI_REGISTRY_IMAGE:latest
