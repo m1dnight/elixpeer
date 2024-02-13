@@ -21,11 +21,13 @@ COPY config config
 RUN mix deps.get --only $MIX_ENV
 RUN mix deps.compile
 
+
 # Compile entire project.
 COPY . .
 RUN mix compile
 
 # Build the entire release.
+RUN mix phx.digest
 RUN mix release
 
 ################################################################################
