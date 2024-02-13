@@ -1,4 +1,7 @@
 defmodule TransmissionManager.Rules do
+  @moduledoc """
+  Defines the basic building blocks for rules to match torrents.
+  """
   alias TransmissionManager.Rule
   alias TransmissionManager.Torrent
 
@@ -9,30 +12,22 @@ defmodule TransmissionManager.Rules do
 
   @spec rule() :: TransmissionManager.Rule.t()
   def rule() do
-    delete_when(
-      older_than(40)
-      |> rule_and(minimal_ratio(1.0))
-      |> rule_and(rule_not(has_tracker(~r/flacsfor\.me/)))
-      |> rule_and(inactive_for(7))
-    )
+    older_than(40)
+    |> rule_and(minimal_ratio(1.0))
+    |> rule_and(rule_not(has_tracker(~r/flacsfor\.me/)))
+    |> rule_and(inactive_for(7))
   end
 
   #############################################################################
   # Application
 
-  @spec apply_rule(Rule.t(), Torrent.t(), (Torrent.t() -> Torrent.t())) :: Torrent.t() | nil
-  def apply_rule(%Rule{action: :delete}, torrent, action) do
-    Logger.debug("deleting '#{torrent.name}' (#{torrent.id})")
+  @spec apply_rule(Rule.t(), Torrent.t()) :: Torrent.t()
+  def apply_rule(%Rule{action: nil}, torrent) do
+    torrent
+  end
+
+  def apply_rule(%Rule{action: action}, torrent) do
     action.(torrent)
-  end
-
-  def apply_rule(%Rule{action: :ignore}, torrent, _action) do
-    Logger.debug("ignoring '#{torrent.name}' (#{torrent.id})")
-    nil
-  end
-
-  def apply_rule(_, _, _) do
-    raise "invalid action in rule"
   end
 
   #############################################################################
@@ -58,19 +53,11 @@ defmodule TransmissionManager.Rules do
   #############################################################################
   # Actions
 
-  def ignore_when(rule) do
+  def do_action(rule, action) do
     %Rule{
-      name: "(ignore #{rule.name})",
+      name: "do #{inspect action} when #{rule.name}",
       rule: rule.rule,
-      action: :ignore
-    }
-  end
-
-  def delete_when(rule) do
-    %Rule{
-      name: "(delete #{rule.name})",
-      rule: rule.rule,
-      action: :delete
+      action: action
     }
   end
 
@@ -79,7 +66,7 @@ defmodule TransmissionManager.Rules do
 
   @spec rule_and(Rule.t(), Rule.t()) :: Rule.t()
   def rule_and(rule_a, rule_b) do
-    label = "(#{rule_a.name} and #{rule_b.name})"
+    label = "#{rule_a.name} and #{rule_b.name}"
 
     %Rule{
       name: label,
@@ -89,7 +76,7 @@ defmodule TransmissionManager.Rules do
 
   @spec rule_or(Rule.t(), Rule.t()) :: Rule.t()
   def rule_or(rule_a, rule_b) do
-    label = "(#{rule_a.name} or #{rule_b.name})"
+    label = "#{rule_a.name} or #{rule_b.name}"
 
     %Rule{
       name: label,
@@ -99,7 +86,7 @@ defmodule TransmissionManager.Rules do
 
   @spec rule_not(Rule.t()) :: Rule.t()
   def rule_not(rule) do
-    label = "(not #{rule.name})"
+    label = "not #{rule.name}"
 
     %Rule{
       name: label,

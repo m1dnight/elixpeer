@@ -12,37 +12,33 @@ defmodule TransmissionManager.RulesTest do
 
   describe "apply_rule/3" do
     test "delete" do
+      # action
+      test_pid = self()
+
+      action = fn torrent ->
+        send(test_pid, :delete)
+        torrent
+      end
+
       # rule
-      rule = delete_when(always_true())
+      rule = always_true() |> do_action(action)
 
       # torrent
       torrent = torrent()
 
-      # action
-      test_pid = self()
-
-      action = fn torrent -> send(test_pid, :delete) end
-
-      apply_rule(rule, torrent, action)
+      assert apply_rule(rule, torrent) == torrent
 
       assert_receive(:delete, 1000)
     end
 
-    test "ignore action" do
+    test "no action" do
       # rule
-      rule = ignore_when(always_true())
+      rule = always_true()
 
       # torrent
       torrent = torrent(%{name: "dont delete me"})
 
-      # action
-      test_pid = self()
-
-      action = fn torrent -> send(test_pid, :not_deleted) end
-
-      apply_rule(rule, torrent, action)
-
-      refute_received(:not_deleted, 1000)
+      assert apply_rule(rule, torrent) == torrent
     end
   end
 

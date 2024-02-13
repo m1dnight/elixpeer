@@ -1,4 +1,7 @@
 defmodule TransmissionManager.Fixtures do
+  @moduledoc """
+  Fixtures to generate entities during testing.
+  """
   alias TransmissionManager.Torrent
   alias TransmissionManager.Tracker
   @spec torrent(map()) :: Torrent.t()
@@ -11,14 +14,13 @@ defmodule TransmissionManager.Fixtures do
         activity_date: DateTime.utc_now(),
         is_finished: false,
         rate_download: 1.0,
-        rate_download: 1.0,
+        rate_upload: 1.0,
         size_when_done: 0,
         upload_ratio: 0.0,
         uploaded: 0,
         downloaded: 0,
         status: 1,
         trackers: [],
-        rate_upload: 1.0,
         percent_done: 0.0
       }
       |> Map.merge(args)

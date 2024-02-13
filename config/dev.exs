@@ -6,7 +6,7 @@ config :transmission_manager,
   refresh_rate_ms: 500,
   # refresh_rate_ms: 500,
   clean_rate_ms: 10_000,
-  dry_run: true,
+  dry_run: false,
   rules: []
 
 #############################################################################
