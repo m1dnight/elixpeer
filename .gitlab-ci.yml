@@ -42,7 +42,8 @@ test:
     - mix local.rebar --force
     - mix deps.get
   services:
-    - lscr.io/linuxserver/transmission
+    - name: lscr.io/linuxserver/transmission:latest  
+      alias: transmission
   image:  ${ELIXIR_IMAGE}
   stage: test
   script:
