@@ -55,7 +55,7 @@ defmodule TransmissionManager.Rules do
 
   def do_action(rule, action) do
     %Rule{
-      name: "do #{inspect action} when #{rule.name}",
+      name: "do action when #{rule.name}",
       rule: rule.rule,
       action: action
     }

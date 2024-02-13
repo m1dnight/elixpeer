@@ -26,20 +26,18 @@ defmodule TransmissionManager.TransmissionConnection do
 
   @impl true
   def handle_info(:sync, state) do
-    # update the torrentlist
-    new_torrents = get_torrents_from_transmission()
-    # broadcast the changed torrentlist
-    Phoenix.PubSub.broadcast(
-      TransmissionManager.PubSub,
-      "torrents",
-      {:new_torrents, new_torrents}
-    )
+    # update the state and move on
+    {:noreply, do_sync(state)}
+  end
 
+  @impl true
+  def handle_info(:scheduled_sync, state) do
+    # update the state
+    new_state = do_sync(state)
     # schedule the next update
     schedule_sync()
 
     # update the state and move on
-    new_state = %{state | torrents: new_torrents}
     {:noreply, new_state}
   end
 
@@ -55,8 +53,26 @@ defmodule TransmissionManager.TransmissionConnection do
     GenServer.call(__MODULE__, :torrents)
   end
 
+  def force_sync() do
+    send(__MODULE__, :sync)
+  end
+
   #############################################################################
   # Helpers
+
+  defp do_sync(state) do
+    # update the torrentlist
+    new_torrents = get_torrents_from_transmission()
+
+    # broadcast the changed torrentlist
+    Phoenix.PubSub.broadcast(
+      TransmissionManager.PubSub,
+      "torrents",
+      {:new_torrents, new_torrents}
+    )
+
+    %{state | torrents: new_torrents}
+  end
 
   defp get_torrents_from_transmission() do
     Transmission.get_torrents()
@@ -64,7 +80,7 @@ defmodule TransmissionManager.TransmissionConnection do
   end
 
   defp schedule_sync(delay \\ @refresh_rate_ms) do
-    Process.send_after(self(), :sync, delay)
+    Process.send_after(self(), :scheduled_sync, delay)
   end
 
   defp transmission_arguments() do
