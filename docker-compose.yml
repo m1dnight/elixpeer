@@ -1,20 +1,22 @@
 version: "3"
 
 services:
-  transmission_manager:
-    image: registry.gitlab.com/cdetroye/transmission-manager:latest
-    restart: unless-stopped
-    environment:
-      - TRANSMISSION_USERNAME=transmission
-      - TRANSMISSION_PASSWORD=transmission
-      - TRANSMISSION_HOST="http://transmission:9091/transmission/rpc"
-      - SECRET_KEY_BASE="jcpqD5Yghhb7oyNYHekSeSCTZ2N4SAPX0LBVtLgTtxJADnzd73RWmN2fD9LnnpiW"
-    ports:
-      - 4000:4000
-
   transmission:
     image: lscr.io/linuxserver/transmission
     environment:
       - USER=transmission
       - PASS=transmission
     restart: unless-stopped      
+
+  transmission_manager:
+    image: registry.gitlab.com/cdetroye/transmission-manager:latest
+    build: .
+    restart: unless-stopped
+    environment:
+      - TRANSMISSION_USERNAME=transmission
+      - TRANSMISSION_PASSWORD=transmission
+      - TRANSMISSION_HOST=http://transmission:9091/transmission/rpc
+      - SECRET_KEY_BASE="jcpqD5Yghhb7oyNYHekSeSCTZ2N4SAPX0LBVtLgTtxJADnzd73RWmN2fD9LnnpiW"
+      - PHX_SERVER=true
+    ports:
+      - 4000:4000
