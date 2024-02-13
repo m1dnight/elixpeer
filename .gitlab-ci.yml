@@ -45,8 +45,6 @@ test:
   #   - postgres:latest
   image:  ${ELIXIR_IMAGE}
   stage: test
-  tags:
-    - loomy.be
   script:
     # - mix ecto.create
     # - mix ecto.migrate
