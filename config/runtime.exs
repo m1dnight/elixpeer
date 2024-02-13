@@ -21,6 +21,33 @@ if System.get_env("PHX_SERVER") do
 end
 
 if config_env() == :prod do
+  config :transmission_manager,
+    credentials: %{
+      username:
+        System.get_env("TRANSMISSION_USERNAME") ||
+          raise("""
+          environment variable DATABASE_URL is missing.
+          For example: ecto://USER:PASS@HOST/DATABASE
+          """),
+      password:
+        System.get_env("TRANSMISSION_PASSWORD") ||
+          raise("""
+          environment variable DATABASE_URL is missing.
+          For example: ecto://USER:PASS@HOST/DATABASE
+          """),
+      host:
+        System.get_env("TRANSMISSION_HOST") ||
+          raise("""
+          environment variable DATABASE_URL is missing.
+          For example: ecto://USER:PASS@HOST/DATABASE
+          """)
+    },
+    refresh_rate_ms: 500,
+    # refresh_rate_ms: 500,
+    clean_rate_ms: 10_000,
+    dry_run: true,
+    rules: []
+
   # database_url =
   #   System.get_env("DATABASE_URL") ||
   #     raise """
