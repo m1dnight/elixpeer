@@ -18,9 +18,10 @@ defmodule TransmissionManager.Cleaner do
     matches = rule_matching_torrents(rule)
 
     for torrent <- matches do
-      Logger.warn """
+      Logger.warning("""
       #{torrent} matches rule #{rule}
-      """
+      """)
+
       if not dryrun?() do
         apply_rule(rule, torrent, fn _ -> :ok end)
       else

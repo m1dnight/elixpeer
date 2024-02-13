@@ -141,7 +141,7 @@ defmodule TransmissionManagerWeb.TorrentsLive do
 
   defp order_torrents(torrents, :ratio_desc) do
     torrents
-    |> Enum.sort_by(&(&1.upload_ratio), :desc)
+    |> Enum.sort_by(& &1.upload_ratio, :desc)
   end
 
   defp order_torrents(torrents, :active_first) do

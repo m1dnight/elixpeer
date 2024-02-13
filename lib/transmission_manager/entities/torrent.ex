@@ -1,5 +1,3 @@
-
-
 defmodule TransmissionManager.Torrent do
   @moduledoc """
   Model of a transmission torrent.

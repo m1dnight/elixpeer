@@ -3,11 +3,6 @@ import Config
 #############################################################################
 # Transmission Login
 config :transmission_manager,
-  credentials: %{
-    username: System.get_env("TRANSMISSION_USERNAME", "transmission"),
-    password: System.get_env("TRANSMISSION_PASSWORD", "transmission"),
-    host: System.get_env("TRANSMISSION_HOST", "http://localhost:9091/transmission/rpc")
-  },
   refresh_rate_ms: 500,
   # refresh_rate_ms: 500,
   clean_rate_ms: 10_000,

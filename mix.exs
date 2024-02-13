@@ -56,7 +56,8 @@ defmodule TransmissionManager.MixProject do
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
       # {:transmission, git: "https://github.com/m1dnight/ex_transmission"}
-      {:transmission, path: "/Users/christophe/Documents/Code/ex_transmission"}
+      {:transmission, path: "/Users/christophe/Documents/Code/ex_transmission"},
+      {:propcheck, "~> 1.4", only: [:test, :dev]}
     ]
   end
 

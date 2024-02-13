@@ -2,6 +2,8 @@ defmodule TransmissionManager.Rules do
   alias TransmissionManager.Rule
   alias TransmissionManager.Torrent
 
+  require Logger
+
   #############################################################################
   # Example Rules
 
@@ -18,8 +20,15 @@ defmodule TransmissionManager.Rules do
   #############################################################################
   # Application
 
-  def apply_rule(%Rule{action: :delete}, torrent, _action) do
-    IO.puts("deleting '#{torrent.name}' (#{torrent.id})")
+  @spec apply_rule(Rule.t(), Torrent.t(), (Torrent.t() -> Torrent.t())) :: Torrent.t() | nil
+  def apply_rule(%Rule{action: :delete}, torrent, action) do
+    Logger.debug("deleting '#{torrent.name}' (#{torrent.id})")
+    action.(torrent)
+  end
+
+  def apply_rule(%Rule{action: :ignore}, torrent, _action) do
+    Logger.debug("ignoring '#{torrent.name}' (#{torrent.id})")
+    nil
   end
 
   def apply_rule(_, _, _) do
@@ -44,6 +53,25 @@ defmodule TransmissionManager.Rules do
 
   def match_rule?(%Rule{rule: rule}, torrent) do
     rule.(torrent)
+  end
+
+  #############################################################################
+  # Actions
+
+  def ignore_when(rule) do
+    %Rule{
+      name: "(ignore #{rule.name})",
+      rule: rule.rule,
+      action: :ignore
+    }
+  end
+
+  def delete_when(rule) do
+    %Rule{
+      name: "(delete #{rule.name})",
+      rule: rule.rule,
+      action: :delete
+    }
   end
 
   #############################################################################
@@ -76,25 +104,6 @@ defmodule TransmissionManager.Rules do
     %Rule{
       name: label,
       rule: {:not, rule}
-    }
-  end
-
-  #############################################################################
-  # Actions
-
-  def ignore_when(rule) do
-    %Rule{
-      name: "(ignore #{rule.name})",
-      rule: rule.rule,
-      action: :ignore
-    }
-  end
-
-  def delete_when(rule) do
-    %Rule{
-      name: "(delete #{rule.name})",
-      rule: rule.rule,
-      action: :delete
     }
   end
 
@@ -164,6 +173,22 @@ defmodule TransmissionManager.Rules do
   def debug_rule() do
     %Rule{
       name: "debug",
+      rule: fn _ -> true end
+    }
+  end
+
+  @spec always_false() :: Rule.t()
+  def always_false() do
+    %Rule{
+      name: "always false",
+      rule: fn _ -> false end
+    }
+  end
+
+  @spec always_true() :: Rule.t()
+  def always_true() do
+    %Rule{
+      name: "always true",
       rule: fn _ -> true end
     }
   end

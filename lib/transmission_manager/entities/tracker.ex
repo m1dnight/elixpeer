@@ -2,8 +2,6 @@ defmodule TransmissionManager.Tracker do
   @moduledoc """
   Model of a transmission tracker.
   """
-  alias __MODULE__
-
   @type t :: %__MODULE__{
           :id => integer(),
           :announce => String.t(),
