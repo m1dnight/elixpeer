@@ -17,17 +17,18 @@ ENV MIX_ENV=prod
 
 # install mix dependencies
 COPY mix.exs mix.lock ./
-COPY config config
+COPY config config 
 RUN mix deps.get --only $MIX_ENV
 RUN mix deps.compile
 
 
 # Compile entire project.
-COPY . .
-RUN mix compile
+COPY lib lib 
+COPY priv priv 
+COPY assets assets
+RUN mix assets.deploy
 
 # Build the entire release.
-RUN mix phx.digest
 RUN mix release
 
 ################################################################################
