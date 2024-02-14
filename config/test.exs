@@ -1,5 +1,22 @@
 import Config
 
+#############################################################################
+# Transmission Login
+config :transmission_manager,
+  credentials: %{
+    username: "transmission",
+    password: "transmission",
+    host: System.get_env("TRANSMISSION_HOST", "http://transmission:9091/transmission/rpc")
+  },
+  refresh_rate_ms: 500,
+  # refresh_rate_ms: 500,
+  clean_rate_ms: 10_000,
+  dry_run: true,
+  rules: []
+
+#############################################################################
+# Repo
+
 # Configure your database
 #
 # The MIX_TEST_PARTITION environment variable can be used
@@ -13,6 +30,9 @@ import Config
 #   pool: Ecto.Adapters.SQL.Sandbox,
 #   pool_size: 10
 
+#############################################################################
+# HTTP Endpoint
+
 # We don't run a server during test. If one is required,
 # you can enable the server option below.
 config :transmission_manager, TransmissionManagerWeb.Endpoint,
@@ -20,14 +40,20 @@ config :transmission_manager, TransmissionManagerWeb.Endpoint,
   secret_key_base: "IeoNMycBUB7M0P34AhNAsRDeZb/wNzrb5p5agOSWNPzaohLOrxIe/cnyCq/8V1Yr",
   server: false
 
+# Initialize plugs at runtime for faster test compilation
+config :phoenix, :plug_init_mode, :runtime
+
+#############################################################################
+# Mailer
+
 # In test we don't send emails.
 config :transmission_manager, TransmissionManager.Mailer, adapter: Swoosh.Adapters.Test
 
 # Disable swoosh api client as it is only required for production adapters.
 config :swoosh, :api_client, false
 
+#############################################################################
+# Logger
+
 # Print only warnings and errors during test
 config :logger, level: :warning
-
-# Initialize plugs at runtime for faster test compilation
-config :phoenix, :plug_init_mode, :runtime
