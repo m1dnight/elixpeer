@@ -27,7 +27,8 @@ if config_env() == :prod do
     "TRANSMISSION_PASSWORD",
     "TRANSMISSION_HOST",
     "SECRET_KEY_BASE",
-    "PHX_HOST"
+    "PHX_HOST",
+    "PHX_SERVER"
   ]
 
   optional_env_vars = [
