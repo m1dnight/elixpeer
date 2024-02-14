@@ -4,7 +4,7 @@ defmodule TransmissionManager.Cleaner.Worker do
   """
   use GenServer
   require Logger
-  @clean_rate_ms Application.compile_env(:transmission_manager, :clean_rate_ms, 60_000)
+
 
   def start_link(_) do
     GenServer.start_link(__MODULE__, nil)
@@ -29,7 +29,8 @@ defmodule TransmissionManager.Cleaner.Worker do
   # Helpers
 
   defp schedule_cleanup() do
-    Logger.warning("next cleanup scheduled in #{@clean_rate_ms}ms")
-    Process.send_after(self(), :cleanup, @clean_rate_ms)
+    clean_rate_ms = Application.get_env(:transmission_manager, :clean_rate_ms, 60_000)
+    Logger.warning("next cleanup scheduled in #{clean_rate_ms}ms")
+    Process.send_after(self(), :cleanup, clean_rate_ms)
   end
 end

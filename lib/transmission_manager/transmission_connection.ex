@@ -7,7 +7,6 @@ defmodule TransmissionManager.TransmissionConnection do
   use GenServer
   alias TransmissionManager.Torrent
 
-  @refresh_rate_ms Application.compile_env(:transmission_manager, :refresh_rate_ms)
   def start_link(_arg, opts \\ []) do
     initial_state = %{torrents: []}
     GenServer.start_link(__MODULE__, initial_state, opts)
@@ -79,7 +78,7 @@ defmodule TransmissionManager.TransmissionConnection do
     |> Enum.map(&Torrent.new/1)
   end
 
-  defp schedule_sync(delay \\ @refresh_rate_ms) do
+  defp schedule_sync(delay \\ Application.get_env(:transmission_manager, :refresh_rate_ms)) do
     Process.send_after(self(), :scheduled_sync, delay)
   end
 
