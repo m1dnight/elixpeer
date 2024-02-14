@@ -5,7 +5,6 @@ defmodule TransmissionManager.Cleaner.Worker do
   use GenServer
   require Logger
 
-
   def start_link(_) do
     GenServer.start_link(__MODULE__, nil)
   end
