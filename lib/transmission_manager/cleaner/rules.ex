@@ -11,10 +11,25 @@ defmodule TransmissionManager.Rules do
   # Example Rules
 
   @spec rule() :: TransmissionManager.Rule.t()
-  def rule() do
+  def rule do
+    exclude_rutracker()
+    |> rule_and(rule_or(old_enough(), seeded_enough()))
+  end
+
+  @spec exclude_rutracker() :: TransmissionManager.Rule.t()
+  defp exclude_rutracker do
+    rule_not(has_tracker(~r/flacsfor\.me/))
+  end
+
+  @spec old_enough() :: TransmissionManager.Rule.t()
+  defp old_enough do
+    older_than(60)
+  end
+
+  @spec seeded_enough() :: TransmissionManager.Rule.t()
+  defp seeded_enough do
     older_than(40)
     |> rule_and(minimal_ratio(1.0))
-    |> rule_and(rule_not(has_tracker(~r/flacsfor\.me/)))
     |> rule_and(inactive_for(7))
   end
 
@@ -140,8 +155,8 @@ defmodule TransmissionManager.Rules do
     }
   end
 
-  @spec is_complete() :: Rule.t()
-  def is_complete() do
+  @spec complete?() :: Rule.t()
+  def complete? do
     %Rule{
       name: "complete",
       rule: &(&1.percent_done == 100)
@@ -149,7 +164,7 @@ defmodule TransmissionManager.Rules do
   end
 
   @spec uploaded_nothing() :: Rule.t()
-  def uploaded_nothing() do
+  def uploaded_nothing do
     %Rule{
       name: "0b upload",
       rule: &(&1.uploaded == 0)
@@ -157,7 +172,7 @@ defmodule TransmissionManager.Rules do
   end
 
   @spec debug_rule() :: Rule.t()
-  def debug_rule() do
+  def debug_rule do
     %Rule{
       name: "debug",
       rule: fn _ -> true end
@@ -165,7 +180,7 @@ defmodule TransmissionManager.Rules do
   end
 
   @spec always_false() :: Rule.t()
-  def always_false() do
+  def always_false do
     %Rule{
       name: "always false",
       rule: fn _ -> false end
@@ -173,7 +188,7 @@ defmodule TransmissionManager.Rules do
   end
 
   @spec always_true() :: Rule.t()
-  def always_true() do
+  def always_true do
     %Rule{
       name: "always true",
       rule: fn _ -> true end

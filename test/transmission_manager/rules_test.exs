@@ -298,10 +298,10 @@ defmodule TransmissionManager.RulesTest do
     end
   end
 
-  describe "is_complete/0" do
+  describe "complete?/0" do
     test "not complete" do
       # rule
-      rule = is_complete()
+      rule = complete?()
 
       # torrent
       torrent = torrent(%{percent_done: 99.9})
@@ -312,7 +312,7 @@ defmodule TransmissionManager.RulesTest do
 
     test "complete" do
       # rule
-      rule = is_complete()
+      rule = complete?()
 
       # torrent
       torrent = torrent(%{percent_done: 100.0})

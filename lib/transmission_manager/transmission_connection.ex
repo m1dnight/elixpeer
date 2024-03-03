@@ -48,11 +48,11 @@ defmodule TransmissionManager.TransmissionConnection do
   #############################################################################
   # Api
 
-  def get_torrents() do
+  def get_torrents do
     GenServer.call(__MODULE__, :torrents)
   end
 
-  def force_sync() do
+  def force_sync do
     send(__MODULE__, :sync)
   end
 
@@ -73,7 +73,7 @@ defmodule TransmissionManager.TransmissionConnection do
     %{state | torrents: new_torrents}
   end
 
-  defp get_torrents_from_transmission() do
+  defp get_torrents_from_transmission do
     Transmission.get_torrents()
     |> Enum.map(&Torrent.new/1)
   end
@@ -82,7 +82,7 @@ defmodule TransmissionManager.TransmissionConnection do
     Process.send_after(self(), :scheduled_sync, delay)
   end
 
-  defp transmission_arguments() do
+  defp transmission_arguments do
     credentials = Application.get_env(:transmission_manager, :credentials, %{})
 
     args = [

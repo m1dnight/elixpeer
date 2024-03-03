@@ -4,9 +4,9 @@ defmodule TransmissionManager.Cleaner do
 
   Given a set of rules, all torrents that match any of the rules will be deleted.
   """
-  alias TransmissionManager.TransmissionConnection
-  alias TransmissionManager.Torrent
   alias TransmissionManager.Rule
+  alias TransmissionManager.Torrent
+  alias TransmissionManager.TransmissionConnection
 
   require Logger
 
@@ -16,7 +16,7 @@ defmodule TransmissionManager.Cleaner do
   Applies all the rules to all torrents and deletes the ones that match any of the rules.
   """
   @spec clean_torrents() :: [Torrent.t()]
-  def clean_torrents() do
+  def clean_torrents do
     rule = do_action(rule(), &delete_torrent/1)
 
     matches = rule_matching_torrents(rule)
@@ -54,7 +54,7 @@ defmodule TransmissionManager.Cleaner do
   end
 
   @spec dryrun?() :: boolean()
-  defp dryrun?() do
+  defp dryrun? do
     Application.get_env(:transmission_manager, :dry_run, true)
   end
 end
