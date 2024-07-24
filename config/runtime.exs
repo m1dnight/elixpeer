@@ -28,7 +28,11 @@ if config_env() == :prod do
     "TRANSMISSION_HOST",
     "SECRET_KEY_BASE",
     "PHX_HOST",
-    "PHX_SERVER"
+    "PHX_SERVER",
+    "MAIL_FROM_ADDRESS",
+    "MAIL_TO_ADDRESS",
+    "MAIL_TO_NAME",
+    "POSTMARK_API_KEY"
   ]
 
   optional_env_vars = [
@@ -78,7 +82,17 @@ if config_env() == :prod do
     },
     refresh_rate_ms: Map.get(vars, "REFRESH_RATE", "500") |> String.to_integer(),
     clean_rate_ms: Map.get(vars, "CLEAN_RATE", "10000") |> String.to_integer(),
-    dry_run: Map.get(vars, "DRY_RUN", "true") |> String.to_atom()
+    dry_run: Map.get(vars, "DRY_RUN", "true") |> String.to_atom(),
+    mail_from_address: Map.get(vars, "MAIL_FROM_ADDRESS"),
+    mail_to_address: Map.get(vars, "MAIL_TO_ADDRESS"),
+    mail_to_name: Map.get(vars, "MAIL_TO_NAME")
+
+  #############################################################################
+  # Swoosh Mails
+
+  config :transmission_manager, TransmissionManager.Mailer,
+    adapter: Swoosh.Adapters.Postmark,
+    api_key: Map.get(vars, "POSTMARK_API_KEY")
 
   #############################################################################
   # Repo

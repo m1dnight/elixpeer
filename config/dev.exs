@@ -9,9 +9,9 @@ config :transmission_manager,
   dry_run: true,
   rules: [],
   dev_routes: true,
-  mail_from_address: "from@example.com",
-  mail_to_address: "to@example.com",
-  mail_to_name: "Example"
+  mail_from_address: "christophe@call-cc.be",
+  mail_to_address: "christophe.detroyer@gmail.com",
+  mail_to_name: "Jos De Bosduif"
 
 #############################################################################
 # Repo
@@ -31,7 +31,10 @@ config :transmission_manager, TransmissionManager.Repo,
 
 # Disable swoosh api client as it is only required for production adapters.
 config :swoosh, :api_client, false
-config :transmission_manager, TransmissionManager.Mailer, adapter: Swoosh.Adapters.Local
+
+config :transmission_manager, TransmissionManager.Mailer,
+  adapter: Swoosh.Adapters.Postmark,
+  api_key: "6d53d319-f3a9-48d2-8bfc-508d866612ca"
 
 #############################################################################
 # HTTP Endpoint
