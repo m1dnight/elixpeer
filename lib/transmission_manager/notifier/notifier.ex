@@ -6,8 +6,8 @@ defmodule TransmissionManager.Notifier do
     template_root: "lib/transmission_manager/notifier/",
     template_path: "/"
 
-  alias TransmissionManager.Torrent
   alias TransmissionManager.Mailer
+  alias TransmissionManager.Torrent
 
   @from_address Application.compile_env(:transmission_manager, :mail_from_address)
   @to_address Application.compile_env(:transmission_manager, :mail_to_address)

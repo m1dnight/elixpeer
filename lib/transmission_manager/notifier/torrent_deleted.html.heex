@@ -380,7 +380,9 @@
                         <tr>
                           <td class="break-all"><%= torrent.name %></td>
                           <td class="no-break"><%= Float.round(torrent.upload_ratio, 2) %></td>
-                          <td class="no-break"><%= Date.diff(Date.utc_today(), torrent.added_date) %></td>
+                          <td class="no-break">
+                            <%= Date.diff(Date.utc_today(), torrent.added_date) %>
+                          </td>
                         </tr>
                       <% end %>
                     </tbody>

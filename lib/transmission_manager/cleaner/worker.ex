@@ -35,7 +35,6 @@ defmodule TransmissionManager.Cleaner.Worker do
     Process.send_after(self(), :cleanup, clean_rate_ms)
   end
 
-
   @spec notify_deleted_torrents([Torrent.t()]) :: {:ok, term()} | {:ok, term()}
   defp notify_deleted_torrents([]), do: {:ok, :no_message_sent}
 

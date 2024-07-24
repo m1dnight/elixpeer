@@ -31,8 +31,7 @@ config :transmission_manager, TransmissionManager.Repo,
 
 # Disable swoosh api client as it is only required for production adapters.
 config :swoosh, :api_client, false
-config :transmission_manager, TransmissionManager.Mailer,
-  adapter: Swoosh.Adapters.Local
+config :transmission_manager, TransmissionManager.Mailer, adapter: Swoosh.Adapters.Local
 
 #############################################################################
 # HTTP Endpoint

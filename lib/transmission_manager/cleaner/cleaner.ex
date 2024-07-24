@@ -4,10 +4,10 @@ defmodule TransmissionManager.Cleaner do
 
   Given a set of rules, all torrents that match any of the rules will be deleted.
   """
+  alias TransmissionManager.Notifier
   alias TransmissionManager.Rule
   alias TransmissionManager.Torrent
   alias TransmissionManager.TransmissionConnection
-  alias TransmissionManager.Notifier
 
   require Logger
 

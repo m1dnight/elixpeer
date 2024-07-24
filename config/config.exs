@@ -35,8 +35,7 @@ config :transmission_manager,
 #############################################################################
 # Swoosh Mails
 
-config :transmission_manager, TransmissionManager.Mailer,
-  adapter: Swoosh.Adapters.Local
+config :transmission_manager, TransmissionManager.Mailer, adapter: Swoosh.Adapters.Local
 
 #############################################################################
 # HTTP Endpoint
