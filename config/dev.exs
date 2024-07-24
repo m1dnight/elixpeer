@@ -5,9 +5,13 @@ import Config
 config :transmission_manager,
   refresh_rate_ms: 500,
   # refresh_rate_ms: 500,
-  clean_rate_ms: 10_000,
-  dry_run: false,
-  rules: []
+  clean_rate_ms: 10_000000,
+  dry_run: true,
+  rules: [],
+  dev_routes: true,
+  mail_from_address: "from@example.com",
+  mail_to_address: "to@example.com",
+  mail_to_name: "Example"
 
 #############################################################################
 # Repo
@@ -21,6 +25,14 @@ config :transmission_manager, TransmissionManager.Repo,
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
+
+#############################################################################
+# Swoosh Mails
+
+# Disable swoosh api client as it is only required for production adapters.
+config :swoosh, :api_client, false
+config :transmission_manager, TransmissionManager.Mailer,
+  adapter: Swoosh.Adapters.Local
 
 #############################################################################
 # HTTP Endpoint
@@ -50,11 +62,6 @@ config :transmission_manager, TransmissionManagerWeb.Endpoint,
       ~r"lib/transmission_manager_web/(controllers|live|components)/.*(ex|heex)$"
     ]
   ]
-
-#############################################################################
-# Mailer
-# Disable swoosh api client as it is only required for production adapters.
-config :swoosh, :api_client, false
 
 #############################################################################
 # Logger

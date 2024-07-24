@@ -17,8 +17,8 @@ defmodule TransmissionManagerWeb.Router do
   scope "/", TransmissionManagerWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
-    live "/torrents", TorrentsLive
+    live "/", TorrentsLive
+    get "/index", PageController, :home
   end
 
   # Other scopes may use custom stacks.

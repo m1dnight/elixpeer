@@ -12,12 +12,12 @@ defmodule TransmissionManager.Rules do
 
   @spec rule() :: TransmissionManager.Rule.t()
   def rule do
-    exclude_rutracker()
+    exclude_redacted()
     |> rule_and(rule_or(old_enough(), seeded_enough()))
   end
 
-  @spec exclude_rutracker() :: TransmissionManager.Rule.t()
-  defp exclude_rutracker do
+  @spec exclude_redacted() :: TransmissionManager.Rule.t()
+  defp exclude_redacted do
     rule_not(has_tracker(~r/flacsfor\.me/))
   end
 

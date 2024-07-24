@@ -7,6 +7,7 @@ defmodule TransmissionManager.Cleaner do
   alias TransmissionManager.Rule
   alias TransmissionManager.Torrent
   alias TransmissionManager.TransmissionConnection
+  alias TransmissionManager.Notifier
 
   require Logger
 
@@ -17,7 +18,8 @@ defmodule TransmissionManager.Cleaner do
   """
   @spec clean_torrents() :: [Torrent.t()]
   def clean_torrents do
-    rule = do_action(rule(), &delete_torrent/1)
+    rule = do_action(debug_rule(), &delete_torrent/1)
+    # rule = do_action(rule(), &delete_torrent/1)
 
     matches = rule_matching_torrents(rule)
 
@@ -47,9 +49,7 @@ defmodule TransmissionManager.Cleaner do
   @spec delete_torrent(Torrent.t()) :: Torrent.t()
   def delete_torrent(torrent) do
     Logger.warning("deleting torrent  '#{torrent.name}' (#{torrent.id})")
-
     Transmission.remove_torrent(torrent.id, true)
-
     torrent
   end
 

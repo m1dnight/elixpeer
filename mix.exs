@@ -44,6 +44,7 @@ defmodule TransmissionManager.MixProject do
       {:esbuild, "~> 0.7", runtime: Mix.env() == :dev},
       {:tailwind, "~> 0.2.0", runtime: Mix.env() == :dev},
       {:swoosh, "~> 1.3"},
+      {:phoenix_swoosh, "~> 1.0"},
       {:finch, "~> 0.13"},
       {:telemetry_metrics, "~> 0.6"},
       {:telemetry_poller, "~> 1.0"},
@@ -57,7 +58,8 @@ defmodule TransmissionManager.MixProject do
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
       {:transmission, git: "https://github.com/m1dnight/ex_transmission"},
       # {:transmission, path: "/Users/christophe/Documents/Code/ex_transmission"},
-      {:propcheck, "~> 1.4", only: [:test, :dev]}
+      {:propcheck, "~> 1.4", only: [:test, :dev]},
+      {:hackney, "~> 1.20"}
     ]
   end
 

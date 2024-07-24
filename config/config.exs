@@ -21,13 +21,22 @@ config :transmission_manager,
   # refresh_rate_ms: 500,
   clean_rate_ms: 10_000,
   dry_run: true,
-  rules: []
+  rules: [],
+  mail_from_address: "from@example.com",
+  mail_to_address: "to@example.com",
+  mail_to_name: "Example"
 
 #############################################################################
 # Repo
 config :transmission_manager,
   ecto_repos: [TransmissionManager.Repo],
   generators: [timestamp_type: :utc_datetime]
+
+#############################################################################
+# Swoosh Mails
+
+config :transmission_manager, TransmissionManager.Mailer,
+  adapter: Swoosh.Adapters.Local
 
 #############################################################################
 # HTTP Endpoint
@@ -68,6 +77,7 @@ config :esbuild,
 
 #############################################################################
 # CSS
+
 # Configure tailwind (the version is required)
 config :tailwind,
   version: "3.3.2",
