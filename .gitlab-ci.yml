@@ -23,18 +23,13 @@ stages:
 ################################################################################
 # Stage Shared 
 
-.stage: &stage 
-
 .build_stage: &build_stage
-  extends: .stage
   stage: build 
 
 .stage_test: &stage_test 
-  extends: .stage
   stage: test
 
 .stage_lint: &stage_lint 
-  extends: .stage
   stage: lint
   # only lint on the main branch
   rules:
@@ -43,7 +38,6 @@ stages:
     - when: never
 
 .stage_docker: &stage_docker 
-  extends: .stage
   stage: docker
   # do not run docker build on renovate branches
   rules:
