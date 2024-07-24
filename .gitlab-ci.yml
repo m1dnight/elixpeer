@@ -103,8 +103,6 @@ test:elixir:
     - name: lscr.io/linuxserver/transmission:latest  
       alias: transmission
   script:
-    - mix ecto.create
-    - mix ecto.migrate
     - mix test
 
 #-------------------------------------------------------------------------------
