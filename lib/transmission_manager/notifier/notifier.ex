@@ -9,15 +9,15 @@ defmodule TransmissionManager.Notifier do
   alias TransmissionManager.Mailer
   alias TransmissionManager.Torrent
 
-  @from_address Application.compile_env(:transmission_manager, :mail_from_address)
-  @to_address Application.compile_env(:transmission_manager, :mail_to_address)
-  @to_name Application.compile_env(:transmission_manager, :mail_to_name)
-
   @spec send_notification(:torrent_deleted, [Torrent.t()]) :: {:error, term()} | {:ok, term()}
   def send_notification(:torrent_deleted, torrents) do
+    from_address = Application.get_env(:transmission_manager, :mail_from_address)
+    to_address = Application.get_env(:transmission_manager, :mail_to_address)
+    to_name = Application.get_env(:transmission_manager, :mail_to_name)
+
     new()
-    |> to({@to_name, @to_address})
-    |> from({"Transmission Manager", @from_address})
+    |> to({to_name, to_address})
+    |> from({"Transmission Manager", from_address})
     |> subject("Removed #{Enum.count(torrents)} torrents")
     |> render_body("torrent_deleted.html", %{torrents: torrents})
     |> text_body("foo")
