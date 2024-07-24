@@ -24,8 +24,6 @@ stages:
 # Stage Shared 
 
 .stage: &stage 
-  tags: 
-    - loomy-be 
 
 .build_stage: &build_stage
   extends: .stage
