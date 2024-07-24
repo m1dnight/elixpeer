@@ -34,7 +34,7 @@ stages:
   # only lint on the main branch
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
-      when: always
+      when: on_success
     - when: never
 
 .stage_docker: &stage_docker 
@@ -45,7 +45,7 @@ stages:
       when: never
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       when: never
-    - when: always
+    - when: on_success
 
     
 ################################################################################
