@@ -1,1 +1,30 @@
-{}
+{
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "packageRules": [
+      {
+        "matchDepTypes": [
+          "devDependencies",
+          "require-dev"
+        ],
+        "matchUpdateTypes": [
+          "patch",
+          "minor",
+          "digest"
+        ],
+        "groupName": "devDependencies (non-major)"
+      },
+      {
+        "matchPackagePatterns": ["transmission"],
+        "matchManagers": ["mix"],
+        "enabled": false
+      }
+    ],
+    "extends": [
+      "config:base",
+      ":preserveSemverRanges",
+      ":dependencyDashboard",
+      ":rebaseStalePrs",
+      ":enableVulnerabilityAlertsWithLabel('security')",
+      "group:recommended"
+    ]
+  }
