@@ -17,8 +17,7 @@ defmodule TransmissionManager.Cleaner do
   """
   @spec clean_torrents() :: [Torrent.t()]
   def clean_torrents do
-    rule = do_action(debug_rule(), &delete_torrent/1)
-    # rule = do_action(rule(), &delete_torrent/1)
+    rule = do_action(rule(), &delete_torrent/1)
 
     matches = rule_matching_torrents(rule)
 
