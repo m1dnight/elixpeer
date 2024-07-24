@@ -17,56 +17,133 @@ variables:
 stages:
   - build
   - test
+  - lint 
   - docker
-  - deploy
+
+################################################################################
+# Stage Shared 
+
+.stage: &stage 
+  tags: 
+    - loomy-be 
+
+.build_stage: &build_stage
+  extends: .stage
+  stage: build 
+
+.stage_test: &stage_test 
+  extends: .stage
+  stage: test
+
+.stage_lint: &stage_lint 
+  extends: .stage
+  stage: lint
+  # only lint on the main branch
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+      when: always
+    - when: never
+
+.stage_docker: &stage_docker 
+  extends: .stage
+  stage: docker
+  # do not run docker build on renovate branches
+  rules:
+    - if: $CI_COMMIT_BRANCH =~ /^renovate/
+      when: never
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: never
+    - when: always
+
+    
+################################################################################
+# Shared 
+
+.elixir: &elixir
+  image: ${ELIXIR_IMAGE}
+  before_script:
+    - mix local.hex --force
+    - mix local.rebar --force
+    - mix deps.get --only $MIX_ENV
+
+################################################################################
+# Config 
 
 cache:
   paths:
     - _build
     - deps
 
-compile:
-  before_script:
-    - mix local.hex --force
-    - mix local.rebar --force
-  image: ${ELIXIR_IMAGE}
-  stage: build
+################################################################################
+# Jobs
+
+#-------------------------------------------------------------------------------
+# Build 
+
+compile_test:elixir:
+  extends:
+    - .build_stage
+    - .elixir
+  variables:
+    MIX_ENV: "prod"
   script:
-    - apt-get update && apt-get -y install postgresql-client
-    - mix deps.get
     - mix compile --warnings-as-errors
 
-test:
-  before_script:
-    - mix local.hex --force
-    - mix local.rebar --force
-    - mix deps.get
+compile_prod:elixir:
+  extends:
+    - .build_stage
+    - .elixir
+  variables:
+    MIX_ENV: "prod"
+  script:
+    - mix compile --warnings-as-errors
+
+#-------------------------------------------------------------------------------
+# Test 
+
+test:elixir:
+  extends:
+    - .stage_test
+    - .elixir 
+  variables:
+    MIX_ENV: "test"
   services:
     - name: lscr.io/linuxserver/transmission:latest  
       alias: transmission
-  image:  ${ELIXIR_IMAGE}
-  stage: test
   script:
-    # - mix ecto.create
-    # - mix ecto.migrate
+    - mix ecto.create
+    - mix ecto.migrate
     - mix test
 
-lint:
-  before_script:
-    - mix local.hex --force
-    - mix local.rebar --force
-  image:  ${ELIXIR_IMAGE}
-  stage: test
+#-------------------------------------------------------------------------------
+# Lint 
+
+credo:elixir:
+  extends: 
+    - .stage_lint
+    - .elixir
+  variables:
+    MIX_ENV: "test"
   script:
-    - mix deps.get
+    - mix credo --strict
+
+style:elixir:
+  extends: 
+    - .stage_lint
+    - .elixir
+  variables:
+    MIX_ENV: "test"
+  script:
     - mix format --check-formatted
-    - mix credo
+
+#-------------------------------------------------------------------------------
+# Docker 
 
 dockerbuild:
+  extends: .stage_docker
   services:
     - docker:dind
   image: docker
-  stage: docker
   script:
     - echo $CI_REGISTRY
     - echo $CI_REGISTRY_USER
