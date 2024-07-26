@@ -53,6 +53,7 @@ defmodule TransmissionManager.Cleaner do
       Logger.warning("deleting torrent  '#{torrent.name}' (#{torrent.id})")
       Transmission.remove_torrent(torrent.id, true)
     end
+
     torrent
   end
 
