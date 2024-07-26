@@ -55,21 +55,21 @@ defmodule TransmissionManager.TorrentsLive.Component do
     <div class="flex flex-row">
       <div class="text-left font-light">
         <!-- Speed -->
-        <span class="bg-blue-100 text-blue-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300">
+        <span class="bg-blue-100 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-blue-900 ">
           <%= Float.round(@torrent.rate_download / :math.pow(1000, 1), 2) %> | <%= Float.round(
             @torrent.rate_upload / :math.pow(1000, 1),
             2
           ) %> kB/s
         </span>
         <!-- Age -->
-        <span class="bg-blue-100 text-blue-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300">
+        <span class="bg-blue-100 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-blue-900">
           <%= Calendar.strftime(@torrent.added_date, "%x") %> (<%= Date.diff(
             DateTime.utc_now(),
             @torrent.added_date
           ) %> days)
         </span>
         <!-- Ratio  and actions-->
-        <span class="bg-blue-100 text-blue-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300">
+        <span class="bg-blue-100 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-blue-900 ">
           <%= Float.round(@torrent.upload_ratio, 2) %>
         </span>
       </div>
@@ -78,7 +78,7 @@ defmodule TransmissionManager.TorrentsLive.Component do
         <!-- Trash -->
         <button phx-click="delete_torrent" phx-value-id={@torrent.id}>
           <svg
-            class="w-4 h-4 text-red-800"
+            class="w-4 h-4 text-red-800 dark:text-red-400"
             aria-hidden="true"
             xmlns="http://www.w3.org/2000/svg"
             fill="currentColor"
@@ -94,7 +94,7 @@ defmodule TransmissionManager.TorrentsLive.Component do
           phx-value-id={@torrent.id}
         >
           <svg
-            class="w-4 h-4 text-red-800"
+            class="w-4 h-4 text-red-800 dark:text-red-400"
             aria-hidden="true"
             xmlns="http://www.w3.org/2000/svg"
             fill="currentColor"
@@ -110,7 +110,7 @@ defmodule TransmissionManager.TorrentsLive.Component do
         <!-- Play -->
         <button :if={@torrent.status == :stopped} phx-click="start_torrent" phx-value-id={@torrent.id}>
           <svg
-            class="w-4 h-4 text-blue-800 dark:text-blue"
+            class="w-4 h-4"
             aria-hidden="true"
             xmlns="http://www.w3.org/2000/svg"
             fill="currentColor"

@@ -20,6 +20,7 @@ defmodule TransmissionManager.Cleaner.Worker do
     removed_torrents = TransmissionManager.Cleaner.clean_torrents()
 
     notify_deleted_torrents(removed_torrents)
+
     # schedule the next cleanup
     schedule_cleanup()
 

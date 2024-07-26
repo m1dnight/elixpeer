@@ -18,8 +18,7 @@ defmodule TransmissionManager.MixProject do
   # Type `mix help compile.app` for more information.
   def application do
     [
-      mod: {TransmissionManager.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      mod: {TransmissionManager.Application, []}
     ]
   end
 

@@ -44,10 +44,15 @@ defmodule TransmissionManager.Cleaner do
     |> Enum.filter(&match_rule?(rule, &1))
   end
 
+  @doc """
+  Removes the given torrent from the transmission endpoint.
+  """
   @spec delete_torrent(Torrent.t()) :: Torrent.t()
   def delete_torrent(torrent) do
-    Logger.warning("deleting torrent  '#{torrent.name}' (#{torrent.id})")
-    Transmission.remove_torrent(torrent.id, true)
+    unless dryrun?() do
+      Logger.warning("deleting torrent  '#{torrent.name}' (#{torrent.id})")
+      Transmission.remove_torrent(torrent.id, true)
+    end
     torrent
   end
 
