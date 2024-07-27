@@ -1,3 +1,4 @@
+# credo:disable-for-this-file Credo.Check.Readability.Specs
 defmodule TransmissionManagerWeb.ErrorJSON do
   # If you want to customize a particular status code,
   # you may add your own clauses, such as:

@@ -1,3 +1,4 @@
+# credo:disable-for-this-file Credo.Check.Readability.Specs
 defmodule TransmissionManagerWeb.TorrentsLive do
   use TransmissionManagerWeb, :live_view
   alias Phoenix.PubSub

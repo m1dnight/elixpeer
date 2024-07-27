@@ -7,6 +7,7 @@ defmodule TransmissionManager.TransmissionConnection do
   use GenServer
   alias TransmissionManager.Torrent
 
+  @spec start_link(any(), Keyword.t()) :: {:ok, pid()} | {:error, term()}
   def start_link(_arg, opts \\ []) do
     initial_state = %{torrents: []}
     GenServer.start_link(__MODULE__, initial_state, opts)
@@ -48,10 +49,12 @@ defmodule TransmissionManager.TransmissionConnection do
   #############################################################################
   # Api
 
+  @spec get_torrents() :: [Torrent.t()]
   def get_torrents do
     GenServer.call(__MODULE__, :torrents)
   end
 
+  @spec force_sync() :: :sync
   def force_sync do
     send(__MODULE__, :sync)
   end
@@ -82,6 +85,7 @@ defmodule TransmissionManager.TransmissionConnection do
     Process.send_after(self(), :scheduled_sync, delay)
   end
 
+  @spec transmission_arguments() :: [String.t()]
   defp transmission_arguments do
     credentials = Application.get_env(:transmission_manager, :credentials, %{})
 
