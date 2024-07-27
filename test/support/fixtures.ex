@@ -28,6 +28,7 @@ defmodule TransmissionManager.Fixtures do
     struct(Torrent, args)
   end
 
+  @spec tracker(map()) :: Tracker.t()
   def tracker(args \\ %{}) do
     args =
       %{

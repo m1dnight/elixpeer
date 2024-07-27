@@ -121,7 +121,7 @@ defmodule ParserTest do
 
     test "faulty field" do
       input = "notafiel"
-      output = {:error, "expected valid field name (age, ratio, or tracker)"}
+      output = {:error, "expected valid field name (age, ratio, tracker or days-inactive)"}
       assert Parser.field(input) |> unwrap == output
     end
   end

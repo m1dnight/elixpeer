@@ -6,6 +6,8 @@ defmodule TransmissionManager.Rules.Validator do
   alias TransmissionManager.Rules.Rule
   alias TransmissionManager.Rules.RuleSet
 
+  @spec valid?(RuleSet.t() | Rule.t()) ::
+          {:ok, RuleSet.t()} | {:ok, Rule.t()} | {:error, String.t()}
   def valid?(ruleset = %RuleSet{}) do
     with {:ok, _rule} <- valid?(ruleset.left),
          {:ok, _rule} <- valid?(ruleset.right) do
@@ -18,7 +20,6 @@ defmodule TransmissionManager.Rules.Validator do
 
   @numerical_operators [{Kernel, :==}, {Kernel, :>=}, {Kernel, :<=}, {Kernel, :>}, {Kernel, :<}]
   @string_operators [{Regex, :match?}, {Kernel, :==}, {Parser, :not_match?}]
-
   def valid?(rule = %Rule{field: :age}) do
     if rule.operator in @numerical_operators do
       {:ok, rule}

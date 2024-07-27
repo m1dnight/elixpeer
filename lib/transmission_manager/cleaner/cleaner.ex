@@ -54,6 +54,7 @@ defmodule TransmissionManager.Cleaner do
     Application.get_env(:transmission_manager, :dry_run, true)
   end
 
+  @spec ruleset() :: {:ok, RuleSet.t()} | {:error, any()}
   defp ruleset do
     with ruleset <- Application.get_env(:transmission_manager, :ruleset),
          {:ok, ruleset} <- Parser.parse(ruleset) do

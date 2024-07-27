@@ -2,13 +2,8 @@ defmodule TransmissionManager.RulesTest do
   use TransmissionManager.DataCase, async: true
 
   import TransmissionManager.Fixtures
-  import TransmissionManager.Rules
-
   alias TransmissionManager.Rules.Matcher
   alias TransmissionManager.Rules.Parser
-  alias TransmissionManager.Rules.Rule
-  alias TransmissionManager.Rules.RuleSet
-  alias TransmissionManager.Torrent
 
   describe "matches?" do
     test "older than a day true" do

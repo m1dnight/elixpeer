@@ -21,10 +21,13 @@ defmodule TransmissionManager.Rules.Parser do
   #############################################################################
   # Operators
 
+  @spec not_match?(Regex.t(), String.t()) :: boolean()
   def not_match?(x, y), do: not Regex.match?(x, y)
 
+  @spec orr(boolean(), boolean()) :: boolean()
   def orr(x, y), do: x or y
 
+  @spec andd(boolean(), boolean()) :: boolean()
   def andd(x, y), do: x and y
 
   #############################################################################

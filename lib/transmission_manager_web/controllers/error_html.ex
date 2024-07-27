@@ -1,3 +1,4 @@
+# credo:disable-for-this-file Credo.Check.Readability.Specs
 defmodule TransmissionManagerWeb.ErrorHTML do
   use TransmissionManagerWeb, :html
 

@@ -121,6 +121,8 @@ defmodule TransmissionManager.Torrent do
 end
 
 defimpl String.Chars, for: TransmissionManager.Torrent do
+  alias TransmissionManager.Torrent
+  @spec to_string(Torrent.t()) :: String.t()
   def to_string(torrent) do
     torrent.name
   end
