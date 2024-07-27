@@ -59,6 +59,17 @@ config :transmission_manager, TransmissionManagerWeb.Endpoint,
     tailwind: {Tailwind, :install_and_run, [:default, ~w(--watch)]}
   ],
   live_reload: [
+    # notify: [
+    #   live_view: [
+    #     ~r"lib/my_app_web/core_components.ex$",
+    #     ~r"lib/my_app_web/(live|components)/.*(ex|heex)$"
+    #   ]
+    # ],
+    # patterns: [
+    #   ~r"priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$",
+    #   ~r"priv/gettext/.*(po)$",
+    #   ~r"lib/transmission_manager_web/(controllers)/.*(ex|heex)$"
+    # ]
     patterns: [
       ~r"priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$",
       ~r"priv/gettext/.*(po)$",

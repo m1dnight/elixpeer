@@ -41,6 +41,81 @@ defmodule TransmissionManager.TorrentsLive.Component do
   #   uploadedEver: 1_231_584_715
   # }
 
+  def summary(assigns) do
+    ~H"""
+    <div class="grid grid-cols-4 gap-1">
+      <button class="">
+        🧮 <%= @torrent_count %> torrents
+      </button>
+      <button class="">
+        🌱 <%= @seeded_torrents %> seeded
+      </button>
+      <button class="">
+        💾 <%= @total_size |> Size.humanize!() %>
+      </button>
+      <button class="">
+        📈 <%= @total_uploaded |> Size.humanize!() %> | 📉 <%= @total_downloaded |> Size.humanize!() %>
+      </button>
+    </div>
+    """
+  end
+
+  def chart(assigns) do
+    # parameters = %{columns = 10
+    # width = 300
+    # height = 100
+    # col_width = width / columns
+    # max_speed = max(1.0, Enum.max(assigns.speed.up, fn -> 0.0 end))}
+
+    max_speed_up = Enum.max(assigns.up_speeds, fn -> 0.0 end)
+    max_speed_down = Enum.max(assigns.down_speeds, fn -> 0.0 end)
+
+    height = 50
+    width = 300
+    columns = 100
+    column_width = width / columns
+
+    params = %{
+      height: height,
+      width: width,
+      columns: columns,
+      column_width: column_width,
+      height_factor_down: height / max(1.0, max_speed_down),
+      height_factor_up: height / max(1.0, max_speed_up),
+      max_up_speed: max_speed_up,
+      max_down_speed: max_speed_down
+    }
+
+    assigns = assign(assigns, params)
+
+    ~H"""
+    <div class="flex flex-row">
+      <div class="svg-container basis-1/1">
+        <svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox={"0 0 #{@width} #{@height}"}>
+          <rect
+            :for={{speed, col} <- Enum.with_index(@up_speeds)}
+            x={col * @column_width}
+            y={1 + @height - speed * @height_factor_up}
+            width={@column_width}
+            height={speed * @height_factor_up}
+            fill="green"
+            fill-opacity="0.5"
+          />
+          <rect
+            :for={{speed, col} <- Enum.with_index(@down_speeds)}
+            x={col * @column_width}
+            y={@height - speed * @height_factor_down}
+            width={@column_width}
+            height={speed * @height_factor_down}
+            fill="red"
+            fill-opacity="1"
+          />
+        </svg>
+      </div>
+    </div>
+    """
+  end
+
   def torrent(assigns) do
     ~H"""
     <!-- Title and size -->
@@ -77,7 +152,7 @@ defmodule TransmissionManager.TorrentsLive.Component do
 
       <div class="grow text-right font-light">
         <!-- Trash -->
-        <button phx-click="delete_torrent" phx-value-id={@torrent.id}>
+        <button phx-click="delete_torrent" phx-value-id={@torrent.id} data-confirm="Are you sure?">
           <svg
             class="w-4 h-4 text-red-800 dark:text-red-400"
             aria-hidden="true"

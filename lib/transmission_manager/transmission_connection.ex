@@ -9,7 +9,14 @@ defmodule TransmissionManager.TransmissionConnection do
 
   @spec start_link(any(), Keyword.t()) :: {:ok, pid()} | {:error, term()}
   def start_link(_arg, opts \\ []) do
-    initial_state = %{torrents: []}
+    initial_state = %{
+      torrents: [],
+      down_speeds: [],
+      up_speeds: [],
+      current_down_speed: 0.0,
+      current_up_speed: 0.0
+    }
+
     GenServer.start_link(__MODULE__, initial_state, opts)
   end
 
@@ -66,14 +73,27 @@ defmodule TransmissionManager.TransmissionConnection do
     # update the torrentlist
     new_torrents = get_torrents_from_transmission()
 
+    # update speed stats
+    {current_down, current_up} =
+      new_torrents
+      |> Enum.reduce({0, 0}, fn t, {down, up} -> {down + t.rate_download, up + t.rate_upload} end)
+
+    new_state =
+      state
+      |> Map.put(:torrents, new_torrents)
+      |> Map.update(:down_speeds, [current_down], &Enum.take([current_down | &1], 100))
+      |> Map.update(:up_speeds, [current_up], &Enum.take([current_up | &1], 100))
+      |> Map.put(:current_up_speed, current_up)
+      |> Map.put(:current_down_speed, current_down)
+
     # broadcast the changed torrentlist
     Phoenix.PubSub.broadcast(
       TransmissionManager.PubSub,
       "torrents",
-      {:new_torrents, new_torrents}
+      {:new_torrents, new_state}
     )
 
-    %{state | torrents: new_torrents}
+    new_state
   end
 
   defp get_torrents_from_transmission do

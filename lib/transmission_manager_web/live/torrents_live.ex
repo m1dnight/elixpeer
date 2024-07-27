@@ -9,82 +9,32 @@ defmodule TransmissionManagerWeb.TorrentsLive do
     # subscribe for updates on the torrentlist
     PubSub.subscribe(TransmissionManager.PubSub, "torrents")
 
-    {:ok, assign(socket, torrents: [], ordering: :oldest_first)}
-  end
-
-  @spec render(assigns :: map) :: Phoenix.LiveView.Rendered.t()
-  def render(assigns) do
-    ~H"""
-    <!-- Menu -->
-    <div class="flex ">
-      <div class="flex items-center me-4">
-        <input
-          checked={@ordering == :newest_first}
-          id="inline-radio"
-          type="radio"
-          value="order_newest_first"
-          name="inline-radio-group"
-          phx-click="order_newest_first"
-          class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-        />
-        <label for="inline-radio" class="ms-2 text-sm font-medium ">
-          Newest first
-        </label>
-      </div>
-      <div class="flex items-center me-4">
-        <input
-          checked={@ordering == :oldest_first}
-          id="inline-2-radio"
-          type="radio"
-          value="order_oldest_first"
-          name="inline-radio-group"
-          phx-click="order_oldest_first"
-          class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-        />
-        <label for="inline-2-radio" class="ms-2 text-sm font-medium">
-          Oldest First
-        </label>
-      </div>
-      <div class="flex items-center me-4">
-        <input
-          checked={@ordering == :active_first}
-          id="inline-radio"
-          type="radio"
-          value="order_active_first"
-          name="inline-radio-group"
-          phx-click="order_active_first"
-          class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-        />
-        <label for="inline-radio" class="ms-2 text-sm font-medium ">
-          Active First
-        </label>
-      </div>
-      <div class="flex items-center me-4">
-        <input
-          checked={@ordering == :ratio_desc}
-          id="inline-radio"
-          type="radio"
-          value="order_active_first"
-          name="inline-radio-group"
-          phx-click="order_ratio_desc"
-          class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-        />
-        <label for="inline-radio" class="ms-2 text-sm font-medium ">
-          Sort by ratio
-        </label>
-      </div>
-    </div>
-    <!-- Torrentlist -->
-    <div class="grid grid-cols-1 gap-1">
-      <%= for t <- @torrents do %>
-        <Component.torrent torrent={t} />
-      <% end %>
-    </div>
-    """
+    {:ok,
+     assign(socket,
+       torrents: [],
+       ordering: :oldest_first,
+       down_speeds: [],
+       up_speeds: [],
+       current_down_speed: 0.0,
+       current_up_speed: 0.0
+     )}
   end
 
   def handle_event("delete_torrent", %{"id" => torrent_id}, socket) do
     Logger.warning("delete torrent #{torrent_id}")
+    Transmission.remove_torrent(String.to_integer(torrent_id), true)
+    {:noreply, socket}
+  end
+
+  def handle_event("pause_torrent", %{"id" => torrent_id}, socket) do
+    Logger.warning("pause torrent #{torrent_id}")
+    Transmission.stop_torrents(String.to_integer(torrent_id))
+    {:noreply, socket}
+  end
+
+  def handle_event("start_torrent", %{"id" => torrent_id}, socket) do
+    Logger.warning("start torrent #{torrent_id}")
+    Transmission.start_torrents(String.to_integer(torrent_id))
     {:noreply, socket}
   end
 
@@ -106,11 +56,15 @@ defmodule TransmissionManagerWeb.TorrentsLive do
     {:noreply, socket}
   end
 
-  def handle_info({:new_torrents, new_torrents}, socket) do
+  @spec handle_info({:new_torrents, %{:torrents => any(), optional(any()) => any()}}, map()) ::
+          {:noreply, any()}
+  def handle_info({:new_torrents, new_state}, socket) do
     # order the torrents
+    Logger.debug("Torrents update: #{inspect(Map.drop(new_state, [:torrents]))}")
+
     socket =
       socket
-      |> assign(:torrents, new_torrents)
+      |> assign(new_state)
       |> apply_ordering()
 
     {:noreply, socket}
