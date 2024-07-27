@@ -12,7 +12,7 @@ config :transmission_manager,
   mail_from_address: "christophe@call-cc.be",
   mail_to_address: "christophe.detroyer@gmail.com",
   mail_to_name: "Jos De Bosduif",
-  ruleset: "age > 0"
+  ruleset: "tracker !~= /flacsfor.me/ and ((age > 10 and ratio > 7 and age > 40) or (age > 60))"
 
 #############################################################################
 # Repo

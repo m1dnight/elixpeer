@@ -16,13 +16,19 @@ defmodule TransmissionManager.Rules.Parser do
   alias __MODULE__
   alias TransmissionManager.Rules.Rule
   alias TransmissionManager.Rules.RuleSet
+  alias TransmissionManager.Rules.Validator
+
+  #############################################################################
+  # Operators
+
+  def not_match?(x, y), do: not Regex.match?(x, y)
+
+  def orr(x, y), do: x or y
+
+  def andd(x, y), do: x and y
 
   #############################################################################
   # Helpers
-
-  def operator_or(x, y), do: x or y
-
-  def operator_and(x, y), do: x and y
 
   whitespace = ascii_char([?\s, ?\t, ?\n, ?\r])
 
@@ -57,7 +63,12 @@ defmodule TransmissionManager.Rules.Parser do
   defparsec :regex, regex
 
   # -- Strings
-  string = ascii_string([?a..?z], min: 1) |> reduce(:parse_string)
+  string =
+    ignore(ascii_char([?']))
+    |> ascii_string([{:not, ?'}], min: 1)
+    |> ignore(ascii_char([?']))
+    |> reduce(:parse_string)
+    |> label("a valid string with single quotes")
 
   defparsec :string, string
 
@@ -87,12 +98,13 @@ defmodule TransmissionManager.Rules.Parser do
 
   operator =
     choice([
-      string("<=") |> replace(&Kernel.<=/2),
-      string(">=") |> replace(&Kernel.>=/2),
-      string("~=") |> replace(&Regex.match?/2),
-      string("<") |> replace(&Kernel.</2),
-      string(">") |> replace(&Kernel.>/2),
-      string("=") |> replace(&Kernel.==/2)
+      string("<=") |> replace({Kernel, :<=}),
+      string(">=") |> replace({Kernel, :>=}),
+      string("~=") |> replace({Regex, :match?}),
+      string("!~=") |> replace({Parser, :not_match?}),
+      string("<") |> replace({Kernel, :<}),
+      string(">") |> replace({Kernel, :>}),
+      string("=") |> replace({Kernel, :==})
     ])
 
   defparsec :operator, operator
@@ -100,11 +112,11 @@ defmodule TransmissionManager.Rules.Parser do
   # -- Combinator
   comb_and =
     string("and")
-    |> replace(&Parser.operator_and/2)
+    |> replace({Parser, :andd})
 
   comb_or =
     string("or")
-    |> replace(&Parser.operator_or/2)
+    |> replace({Parser, :orr})
 
   combinator =
     choice([
@@ -118,16 +130,16 @@ defmodule TransmissionManager.Rules.Parser do
   # Value
 
   defparsec :value,
-            choice([float, int, string])
-            |> label("valid value (integer, float, or string)")
+            choice([regex, float, int, string])
+            |> label("valid value (regex, integer, float, or string)")
 
   #############################################################################
   # Field
 
   defparsec :field,
-            choice([string("age"), string("ratio"), string("tracker")])
+            choice([string("age"), string("ratio"), string("tracker"), string("days-inactive")])
             |> reduce(:atomize)
-            |> label("valid field name (age, ratio, or tracker)")
+            |> label("valid field name (age, ratio, tracker or days-inactive)")
 
   #############################################################################
   # Rule
@@ -210,6 +222,13 @@ defmodule TransmissionManager.Rules.Parser do
 
   @spec parse(String.t()) :: {:ok, RuleSet.t()} | {:error, String.t()}
   def parse(input) do
-    rules(input) |> unwrap()
+    with result <- rules(input),
+         {:ok, result} <- unwrap(result),
+         {:ok, rule} <- Validator.valid?(result) do
+      {:ok, rule}
+    else
+      {:error, reason} ->
+        {:error, reason}
+    end
   end
 end

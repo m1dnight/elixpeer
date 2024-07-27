@@ -19,10 +19,12 @@ defmodule TransmissionManager.Rules.RuleSet do
   A rule to match torrents to.
   """
 
+  alias TransmissionManager.Rules.Rule
+
   @type t :: %__MODULE__{
           combinator: :and | :or,
-          left: t | TransmissionManager.Parser.Rule.t(),
-          right: t | TransmissionManager.Parser.Rule.t()
+          left: t | Rule.t(),
+          right: t | Rule.t()
         }
 
   @keys [:combinator, :left, :right]
