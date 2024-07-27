@@ -132,10 +132,11 @@ defmodule TransmissionManager.TorrentsLive.Component do
       <div class="text-left font-light">
         <!-- Speed -->
         <span class="bg-blue-100 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-blue-900 ">
-          <%= Float.round(@torrent.rate_download / :math.pow(1000, 1), 2) %> | <%= Float.round(
-            @torrent.rate_upload / :math.pow(1000, 1),
-            2
-          ) %> kB/s
+          <%= if @torrent.rate_download > 0,
+            do: "#{@torrent.rate_download |> trunc |> Size.humanize!(bits: true)}/s",
+            else: "--" %> | <%= if @torrent.rate_upload > 0,
+            do: "#{@torrent.rate_upload |> trunc |> Size.humanize!(bits: true)}/s",
+            else: "--" %>
         </span>
         <!-- Age -->
         <span class="bg-blue-100 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-blue-900">
@@ -143,6 +144,10 @@ defmodule TransmissionManager.TorrentsLive.Component do
             DateTime.utc_now(),
             @torrent.added_date
           ) %> days)
+        </span>
+        <!-- Ratio  and actions-->
+        <span class="bg-blue-100 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-blue-900 ">
+          <%= Size.humanize!(@torrent.size_when_done) %>
         </span>
         <!-- Ratio  and actions-->
         <span class="bg-blue-100 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-blue-900 ">
