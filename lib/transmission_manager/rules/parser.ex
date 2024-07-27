@@ -24,15 +24,32 @@ defmodule TransmissionManager.Rules.Parser do
     acc |> hd() |> String.to_atom()
   end
 
-  #############################################################################
-  # Literals
-
-  # -- Strings
-  string = ascii_string([?a..?z], min: 1) |> reduce(:parse_string)
-
   defp parse_string([acc]) do
     acc
   end
+
+  defp to_regex(acc) do
+    acc
+    |> to_string()
+    |> Regex.compile!()
+  end
+
+  #############################################################################
+  # Literals
+
+  # -- Regex
+
+  regex =
+    ignore(ascii_char([?/]))
+    |> times(ascii_char([{:not, ?/}]), min: 1)
+    |> ignore(ascii_char([?/]))
+    |> label("valid regular expression")
+    |> reduce(:to_regex)
+
+  defparsec :regex, regex
+
+  # -- Strings
+  string = ascii_string([?a..?z], min: 1) |> reduce(:parse_string)
 
   defparsec :string, string
 
@@ -156,8 +173,9 @@ defmodule TransmissionManager.Rules.Parser do
     |> ignore(rparen)
 
   # <rule> | <group>
-  defparsec :rule_unit, choice([parsec(:single_rule), group])
-  |> label("valid rule or multiple rules in parentheses")
+  defparsec :rule_unit,
+            choice([parsec(:single_rule), group])
+            |> label("valid rule or multiple rules in parentheses")
 
   # <rule> and <rule>
   defparsec :and_rule,

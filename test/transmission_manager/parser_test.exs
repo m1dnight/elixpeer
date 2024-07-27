@@ -7,6 +7,26 @@ defmodule ParserTest do
   defp unwrap({:ok, _, rest, _, _, _}), do: {:error, "could not parse" <> rest}
   defp unwrap({:error, reason, _rest, _, _, _}), do: {:error, reason}
 
+  describe "regex" do
+    test "simple regex" do
+      input = "/flacsfor.me/"
+      output = ~r/flacsfor.me/
+      assert Parser.regex(input) |> unwrap == output
+    end
+
+    test "regex with escape char" do
+      input = "/flacsfor\\.me/"
+      output = ~r/flacsfor\.me/
+      assert Parser.regex(input) |> unwrap == output
+    end
+
+    test "regex with asterisk" do
+      input = "/flacsfor.*/"
+      output = ~r/flacsfor.*/
+      assert Parser.regex(input) |> unwrap == output
+    end
+  end
+
   describe "string" do
     test "string" do
       input = "astring"
@@ -64,7 +84,7 @@ defmodule ParserTest do
 
       output =
         {:error,
-         "expected string \"<=\" or string \">=\" or string \"<\" or string \">\" or string \"=\""}
+         "expected string \"<=\" or string \">=\" or string \"~=\" or string \"<\" or string \">\" or string \"=\""}
 
       assert Parser.operator(input) |> unwrap == output
     end
