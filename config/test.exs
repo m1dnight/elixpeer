@@ -6,7 +6,7 @@ config :transmission_manager,
   credentials: %{
     username: "transmission",
     password: "transmission",
-    host: "http://localhost:9091/transmission/rpc"
+    host: "http://transmission:9091/transmission/rpc"
   },
   refresh_rate_ms: 500,
   # refresh_rate_ms: 500,
