@@ -58,7 +58,8 @@ defmodule TransmissionManager.MixProject do
       {:transmission, git: "https://github.com/m1dnight/ex_transmission"},
       # {:transmission, path: "/Users/christophe/Documents/Code/ex_transmission"},
       {:propcheck, "~> 1.4", only: [:test, :dev]},
-      {:hackney, "~> 1.20"}
+      {:hackney, "~> 1.20"},
+      {:nimble_parsec, "~> 1.4.0"}
     ]
   end
 
