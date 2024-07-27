@@ -60,8 +60,6 @@ defmodule TransmissionManagerWeb.TorrentsLive do
           {:noreply, any()}
   def handle_info({:new_torrents, new_state}, socket) do
     # order the torrents
-    Logger.debug("Torrents update: #{inspect(Map.drop(new_state, [:torrents]))}")
-
     socket =
       socket
       |> assign(new_state)
