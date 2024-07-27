@@ -99,7 +99,7 @@ defmodule ParserTest do
 
     test "faulty field" do
       input = "notafiel"
-      output = {:error, "expected string \"age\" or string \"ratio\" or string \"tracker\""}
+      output = {:error, "expected valid field name (age, ratio, or tracker)"}
       assert Parser.field(input) |> unwrap == output
     end
   end
@@ -120,6 +120,12 @@ defmodule ParserTest do
     test "value string" do
       input = "astring"
       output = "astring"
+      assert Parser.value(input) |> unwrap == output
+    end
+
+    test "invalid value" do
+      input = "***"
+      output = {:error, "expected valid value (integer, float, or string)"}
       assert Parser.value(input) |> unwrap == output
     end
   end
@@ -235,6 +241,20 @@ defmodule ParserTest do
         right: %{left: output2, right: output3, combinator: :and}
       }
 
+      assert Parser.rules(input) |> unwrap == output
+    end
+  end
+
+  describe "errors" do
+    test "invalid field" do
+      input = "notafiel = 1"
+      output = {:error, "expected valid rule or multiple rules in parentheses"}
+      assert Parser.rules(input) |> unwrap == output
+    end
+
+    test "invalid combinator" do
+      input = "age = 10 xor age = 10"
+      output = {:error, "expected end of string"}
       assert Parser.rules(input) |> unwrap == output
     end
   end

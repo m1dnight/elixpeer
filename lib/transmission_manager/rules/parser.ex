@@ -92,13 +92,17 @@ defmodule TransmissionManager.Rules.Parser do
   #############################################################################
   # Value
 
-  defparsec :value, choice([float, int, string])
+  defparsec :value,
+            choice([float, int, string])
+            |> label("valid value (integer, float, or string)")
 
   #############################################################################
   # Field
 
   defparsec :field,
-            choice([string("age"), string("ratio"), string("tracker")]) |> reduce(:atomize)
+            choice([string("age"), string("ratio"), string("tracker")])
+            |> reduce(:atomize)
+            |> label("valid field name (age, ratio, or tracker)")
 
   #############################################################################
   # Rule
@@ -114,6 +118,7 @@ defmodule TransmissionManager.Rules.Parser do
     |> ignore(whitespace)
     |> parsec(:value)
     |> reduce(:parse_rule)
+    |> label("valid rule")
 
   defparsec :single_rule, rule
 
@@ -151,6 +156,7 @@ defmodule TransmissionManager.Rules.Parser do
 
   # <rule> | <group>
   defparsec :rule_unit, choice([parsec(:single_rule), group])
+  |> label("valid rule or multiple rules in parentheses")
 
   # <rule> and <rule>
   defparsec :and_rule,
@@ -164,5 +170,5 @@ defmodule TransmissionManager.Rules.Parser do
             |> repeat(spaces |> concat(comb_or) |> concat(spaces) |> parsec(:and_rule))
             |> reduce(:fold)
 
-  defparsec :rules, parsec(:or_rule)
+  defparsec :rules, parsec(:or_rule) |> eos()
 end
