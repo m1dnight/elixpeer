@@ -64,6 +64,7 @@ defmodule TransmissionManager.Rules.Parser do
     choice([
       string("<="),
       string(">="),
+      string("~="),
       string("<"),
       string(">"),
       string("=")
