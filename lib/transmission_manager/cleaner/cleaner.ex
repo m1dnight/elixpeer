@@ -24,12 +24,7 @@ defmodule TransmissionManager.Cleaner do
     deleted_torrents =
       for torrent <- matches do
         Logger.warning("#{torrent} match:\n#{rule}")
-
-        if dryrun?() do
-          torrent
-        else
-          apply_rule(rule, torrent)
-        end
+        apply_rule(rule, torrent)
       end
 
     # force refresh the torrents from the server
