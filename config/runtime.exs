@@ -32,7 +32,8 @@ if config_env() == :prod do
     "MAIL_FROM_ADDRESS",
     "MAIL_TO_ADDRESS",
     "MAIL_TO_NAME",
-    "POSTMARK_API_KEY"
+    "POSTMARK_API_KEY",
+    "RULESET"
   ]
 
   optional_env_vars = [
@@ -85,7 +86,8 @@ if config_env() == :prod do
     dry_run: Map.get(vars, "DRY_RUN", "true") |> String.to_atom(),
     mail_from_address: Map.get(vars, "MAIL_FROM_ADDRESS"),
     mail_to_address: Map.get(vars, "MAIL_TO_ADDRESS"),
-    mail_to_name: Map.get(vars, "MAIL_TO_NAME")
+    mail_to_name: Map.get(vars, "MAIL_TO_NAME"),
+    ruleset: Map.get(vars, "RULESET")
 
   #############################################################################
   # Swoosh Mails
