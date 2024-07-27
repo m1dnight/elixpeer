@@ -2,8 +2,8 @@ defmodule ParserTest do
   use ExUnit.Case
 
   alias TransmissionManager.Rules.Parser
-  alias TransmissionManager.Parser.Rule
-  alias TransmissionManager.Parser.RuleSet
+  alias TransmissionManager.Rules.Rule
+  alias TransmissionManager.Rules.RuleSet
 
   defp unwrap({:ok, [acc], "", _, _, _}), do: acc
   defp unwrap({:ok, _, rest, _, _, _}), do: {:error, "could not parse" <> rest}
@@ -154,25 +154,22 @@ defmodule ParserTest do
 
   describe "rule" do
     test "rule" do
-      fields = ["age", "ratio", "tracker"]
-      operators = ["<", ">", "<=", ">=", "="]
-      values = ["12", "12.34", "astring"]
+      fields = [:age, :ratio, :tracker]
 
-      for field <- fields, operator <- operators, value <- values do
-        input = "#{field} #{operator} #{value}"
+      operators = [
+        {&Kernel.<=/2, "<="},
+        {&Kernel.>/2, ">"},
+        {&Kernel.<=/2, "<="},
+        {&Kernel.>=/2, ">="},
+        {&Kernel.==/2, "="}
+      ]
 
-        # construct expected output
-        output_field = String.to_atom(field)
-        output_operator = String.to_atom(operator)
+      values = [12, 12.34, "astring"]
 
-        output_value =
-          case {Integer.parse(value), Float.parse(value)} do
-            {{int, ""}, _} -> int
-            {_, {float, ""}} -> float
-            _ -> value
-          end
+      for field <- fields, {operator, operator_str} <- operators, value <- values do
+        input = "#{field} #{operator_str} #{value}"
 
-        output = %Rule{field: output_field, operator: output_operator, value: output_value}
+        output = %Rule{field: field, operator: operator, value: value}
         assert Parser.single_rule(input) |> unwrap == output, input
       end
     end
@@ -181,17 +178,25 @@ defmodule ParserTest do
   describe "rules" do
     test "generated rules" do
       fields = [:age, :ratio, :tracker]
-      operators = [:<, :>, :<=, :>=, :=]
-      values = [12, 12.34, "astring"]
-      combinators = [:or, :and]
 
-      for combinator <- combinators do
-        for field1 <- fields, operator1 <- operators, value1 <- values do
-          for field2 <- fields, operator2 <- operators, value2 <- values do
+      operators = [
+        {&Kernel.<=/2, "<="},
+        {&Kernel.>/2, ">"},
+        {&Kernel.<=/2, "<="},
+        {&Kernel.>=/2, ">="},
+        {&Kernel.==/2, "="}
+      ]
+
+      values = [12, 12.34, "astring"]
+      combinators = [{&Parser.operator_or/2, "or"}, {&Parser.operator_and/2, "and"}]
+
+      for {combinator, combinator_str} <- combinators do
+        for field1 <- fields, {operator1, operator_str1} <- operators, value1 <- values do
+          for field2 <- fields, {operator2, operator_str2} <- operators, value2 <- values do
             # construct a combined rule
-            rule1 = "#{field1} #{operator1} #{value1}"
-            rule2 = "#{field2} #{operator2} #{value2}"
-            input = "#{rule1} #{combinator} #{rule2}"
+            rule1 = "#{field1} #{operator_str1} #{value1}"
+            rule2 = "#{field2} #{operator_str2} #{value2}"
+            input = "#{rule1} #{combinator_str} #{rule2}"
 
             # construct expected output
             output = %RuleSet{
@@ -208,14 +213,14 @@ defmodule ParserTest do
 
     test "precedence and over or" do
       input = "age = 1 or age = 2 and age = 3"
-      output1 = %Rule{value: 1, field: :age, operator: :=}
-      output2 = %Rule{value: 2, field: :age, operator: :=}
-      output3 = %Rule{value: 3, field: :age, operator: :=}
+      output1 = %Rule{value: 1, field: :age, operator: &Kernel.==/2}
+      output2 = %Rule{value: 2, field: :age, operator: &Kernel.==/2}
+      output3 = %Rule{value: 3, field: :age, operator: &Kernel.==/2}
 
       output = %RuleSet{
         left: output1,
-        right: %RuleSet{left: output2, right: output3, combinator: :and},
-        combinator: :or
+        right: %RuleSet{left: output2, right: output3, combinator: &Parser.operator_and/2},
+        combinator: &Parser.operator_or/2
       }
 
       assert Parser.rules(input) |> unwrap == output
@@ -223,13 +228,13 @@ defmodule ParserTest do
 
     test "precedence and and and" do
       input = "age = 1 and age = 2 and age = 3"
-      output1 = %Rule{value: 1, field: :age, operator: :=}
-      output2 = %Rule{value: 2, field: :age, operator: :=}
-      output3 = %Rule{value: 3, field: :age, operator: :=}
+      output1 = %Rule{value: 1, field: :age, operator: &Kernel.==/2}
+      output2 = %Rule{value: 2, field: :age, operator: &Kernel.==/2}
+      output3 = %Rule{value: 3, field: :age, operator: &Kernel.==/2}
 
       output = %RuleSet{
-        combinator: :and,
-        left: %RuleSet{left: output1, right: output2, combinator: :and},
+        combinator: &Parser.operator_and/2,
+        left: %RuleSet{left: output1, right: output2, combinator: &Parser.operator_and/2},
         right: output3
       }
 
@@ -238,14 +243,14 @@ defmodule ParserTest do
 
     test "grouping and or" do
       input = "age = 1 and (age = 2 or age = 3)"
-      output1 = %Rule{value: 1, field: :age, operator: :=}
-      output2 = %Rule{value: 2, field: :age, operator: :=}
-      output3 = %Rule{value: 3, field: :age, operator: :=}
+      output1 = %Rule{value: 1, field: :age, operator: &Kernel.==/2}
+      output2 = %Rule{value: 2, field: :age, operator: &Kernel.==/2}
+      output3 = %Rule{value: 3, field: :age, operator: &Kernel.==/2}
 
       output = %RuleSet{
-        combinator: :and,
+        combinator: &Parser.operator_and/2,
         left: output1,
-        right: %RuleSet{left: output2, right: output3, combinator: :or}
+        right: %RuleSet{left: output2, right: output3, combinator: &Parser.operator_or/2}
       }
 
       assert Parser.rules(input) |> unwrap == output
@@ -253,14 +258,14 @@ defmodule ParserTest do
 
     test "grouping or and" do
       input = "age = 1 or (age = 2 and age = 3)"
-      output1 = %Rule{value: 1, field: :age, operator: :=}
-      output2 = %Rule{value: 2, field: :age, operator: :=}
-      output3 = %Rule{value: 3, field: :age, operator: :=}
+      output1 = %Rule{value: 1, field: :age, operator: &Kernel.==/2}
+      output2 = %Rule{value: 2, field: :age, operator: &Kernel.==/2}
+      output3 = %Rule{value: 3, field: :age, operator: &Kernel.==/2}
 
       output = %RuleSet{
-        combinator: :or,
+        combinator: &Parser.operator_or/2,
         left: output1,
-        right: %RuleSet{left: output2, right: output3, combinator: :and}
+        right: %RuleSet{left: output2, right: output3, combinator: &Parser.operator_and/2}
       }
 
       assert Parser.rules(input) |> unwrap == output

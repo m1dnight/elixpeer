@@ -1,4 +1,4 @@
-defmodule TransmissionManager.Parser.Rule do
+defmodule TransmissionManager.Rules.Rule do
   @moduledoc """
   A rule to match torrents to.
   """
@@ -14,7 +14,7 @@ defmodule TransmissionManager.Parser.Rule do
   defstruct @keys
 end
 
-defmodule TransmissionManager.Parser.RuleSet do
+defmodule TransmissionManager.Rules.RuleSet do
   @moduledoc """
   A rule to match torrents to.
   """

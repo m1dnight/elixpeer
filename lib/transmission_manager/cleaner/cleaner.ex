@@ -5,6 +5,7 @@ defmodule TransmissionManager.Cleaner do
   Given a set of rules, all torrents that match any of the rules will be deleted.
   """
   alias TransmissionManager.Rule
+  alias TransmissionManager.Rules.Parser
   alias TransmissionManager.Torrent
   alias TransmissionManager.TransmissionConnection
 
@@ -17,20 +18,21 @@ defmodule TransmissionManager.Cleaner do
   """
   @spec clean_torrents() :: [Torrent.t()]
   def clean_torrents do
-    rule = do_action(rule(), &delete_torrent/1)
+    # read the ruleset from the configuration
+    {:ok, ruleset} = ruleset()
 
-    matches = rule_matching_torrents(rule)
+    # matches = rule_matching_torrents(rule)
 
-    deleted_torrents =
-      for torrent <- matches do
-        Logger.warning("#{torrent} match:\n#{rule}")
-        apply_rule(rule, torrent)
-      end
+    # deleted_torrents =
+    #   for torrent <- matches do
+    #     Logger.warning("#{torrent} match:\n#{rule}")
+    #     apply_rule(rule, torrent)
+    #   end
 
-    # force refresh the torrents from the server
-    TransmissionConnection.force_sync()
+    # # force refresh the torrents from the server
+    # TransmissionConnection.force_sync()
 
-    deleted_torrents
+    # deleted_torrents
   end
 
   @spec rule_matching_torrents(Rule.t()) :: [TransmissionManager.Torrent.t()]
@@ -52,8 +54,15 @@ defmodule TransmissionManager.Cleaner do
     torrent
   end
 
+  #############################################################################
+  # Helpers
+
   @spec dryrun?() :: boolean()
   defp dryrun? do
     Application.get_env(:transmission_manager, :dry_run, true)
+  end
+
+  defp ruleset() do
+    Application.get_env(:transmission_manager, :rule) |> Parser.rules()
   end
 end

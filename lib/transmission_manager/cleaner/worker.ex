@@ -33,7 +33,12 @@ defmodule TransmissionManager.Cleaner.Worker do
   defp schedule_cleanup do
     clean_rate_ms = Application.get_env(:transmission_manager, :clean_rate_ms, 60_000)
     Logger.debug("next cleanup scheduled in #{clean_rate_ms}ms")
-    Process.send_after(self(), :cleanup, clean_rate_ms)
+
+    if clean_rate_ms == -1 do
+      Logger.warning("cleaning is disabled")
+    else
+      Process.send_after(self(), :cleanup, clean_rate_ms)
+    end
   end
 
   @spec notify_deleted_torrents([Torrent.t()]) :: {:ok, term()} | {:ok, term()}

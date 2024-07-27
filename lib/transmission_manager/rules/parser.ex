@@ -13,11 +13,16 @@ defmodule TransmissionManager.Rules.Parser do
   """
   import NimbleParsec
 
-  alias TransmissionManager.Parser.Rule
-  alias TransmissionManager.Parser.RuleSet
+  alias __MODULE__
+  alias TransmissionManager.Rules.Rule
+  alias TransmissionManager.Rules.RuleSet
 
   #############################################################################
   # Helpers
+
+  def operator_or(x, y), do: x or y
+
+  def operator_and(x, y), do: x and y
 
   whitespace = ascii_char([?\s, ?\t, ?\n, ?\r])
 
@@ -82,25 +87,24 @@ defmodule TransmissionManager.Rules.Parser do
 
   operator =
     choice([
-      string("<="),
-      string(">="),
-      string("~="),
-      string("<"),
-      string(">"),
-      string("=")
+      string("<=") |> replace(&Kernel.<=/2),
+      string(">=") |> replace(&Kernel.>=/2),
+      string("~=") |> replace(&Regex.match?/2),
+      string("<") |> replace(&Kernel.</2),
+      string(">") |> replace(&Kernel.>/2),
+      string("=") |> replace(&Kernel.==/2)
     ])
-    |> reduce(:atomize)
 
   defparsec :operator, operator
 
   # -- Combinator
   comb_and =
     string("and")
-    |> reduce(:atomize)
+    |> replace(&Parser.operator_and/2)
 
   comb_or =
     string("or")
-    |> reduce(:atomize)
+    |> replace(&Parser.operator_or/2)
 
   combinator =
     choice([
@@ -161,8 +165,11 @@ defmodule TransmissionManager.Rules.Parser do
     |> Enum.reverse()
     |> Enum.chunk_every(2)
     |> List.foldr([], fn
-      [l], [] -> l
-      [r, op], l -> %RuleSet{combinator: op, left: l, right: r}
+      [l], [] ->
+        l
+
+      [r, op], l ->
+        %RuleSet{combinator: op, left: l, right: r}
     end)
   end
 
@@ -193,4 +200,16 @@ defmodule TransmissionManager.Rules.Parser do
             |> reduce(:fold)
 
   defparsec :rules, parsec(:or_rule) |> eos()
+
+  #############################################################################
+  # Entrypoint
+
+  defp unwrap({:ok, [acc], "", _, _, _}), do: {:ok, acc}
+  defp unwrap({:ok, _, rest, _, _, _}), do: {:error, "could not parse ruleset" <> rest}
+  defp unwrap({:error, reason, _rest, _, _, _}), do: {:error, reason}
+
+  @spec parse(String.t()) :: {:ok, RuleSet.t()} | {:error, String.t()}
+  def parse(input) do
+    rules(input) |> unwrap()
+  end
 end

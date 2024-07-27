@@ -5,13 +5,14 @@ import Config
 config :transmission_manager,
   refresh_rate_ms: 500,
   # refresh_rate_ms: 500,
-  clean_rate_ms: 10_000000,
+  clean_rate_ms: -1,
   dry_run: true,
   rules: [],
   dev_routes: true,
   mail_from_address: "christophe@call-cc.be",
   mail_to_address: "christophe.detroyer@gmail.com",
-  mail_to_name: "Jos De Bosduif"
+  mail_to_name: "Jos De Bosduif",
+  ruleset: "age > 0"
 
 #############################################################################
 # Repo
