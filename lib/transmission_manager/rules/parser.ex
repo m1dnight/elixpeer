@@ -13,6 +13,9 @@ defmodule TransmissionManager.Rules.Parser do
   """
   import NimbleParsec
 
+  alias TransmissionManager.Parser.Rule
+  alias TransmissionManager.Parser.RuleSet
+
   #############################################################################
   # Helpers
 
@@ -126,7 +129,7 @@ defmodule TransmissionManager.Rules.Parser do
   # Rule
 
   defp parse_rule([field, operator, value]) do
-    %{field: field, operator: operator, value: value}
+    %Rule{field: field, operator: operator, value: value}
   end
 
   rule =
@@ -159,7 +162,7 @@ defmodule TransmissionManager.Rules.Parser do
     |> Enum.chunk_every(2)
     |> List.foldr([], fn
       [l], [] -> l
-      [r, op], l -> %{combinator: op, left: l, right: r}
+      [r, op], l -> %RuleSet{combinator: op, left: l, right: r}
     end)
   end
 
