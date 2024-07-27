@@ -49,7 +49,8 @@ config :transmission_manager, TransmissionManagerWeb.Endpoint,
     layout: false
   ],
   pubsub_server: TransmissionManager.PubSub,
-  live_view: [signing_salt: "XWsvW5eM"]
+  live_view: [signing_salt: "XWsvW5eM"],
+  check_origin: :conn
 
 #############################################################################
 # Mailer
