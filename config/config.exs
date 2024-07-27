@@ -24,7 +24,8 @@ config :transmission_manager,
   rules: [],
   mail_from_address: "from@example.com",
   mail_to_address: "to@example.com",
-  mail_to_name: "Example"
+  mail_to_name: "Example",
+  ruleset: System.get_env("RULESET", "age > 10000000000")
 
 #############################################################################
 # Repo
