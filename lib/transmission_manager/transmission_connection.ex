@@ -81,8 +81,8 @@ defmodule TransmissionManager.TransmissionConnection do
     new_state =
       state
       |> Map.put(:torrents, new_torrents)
-      |> Map.update(:down_speeds, [current_down], &Enum.take([current_down | &1], 100))
-      |> Map.update(:up_speeds, [current_up], &Enum.take([current_up | &1], 100))
+      |> Map.update(:down_speeds, [current_down], &Enum.take([current_down | &1], 500))
+      |> Map.update(:up_speeds, [current_up], &Enum.take([current_up | &1], 500))
       |> Map.put(:current_up_speed, current_up)
       |> Map.put(:current_down_speed, current_down)
 

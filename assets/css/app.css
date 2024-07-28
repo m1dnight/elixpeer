@@ -2,11 +2,6 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
-svg {
-  width: 95%;
-  height: 95%;
-}
-
 svg > text {
   font-size: 0.5rem;
   font-family: "Courier New", Courier, monospace;

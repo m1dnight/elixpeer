@@ -70,9 +70,9 @@ defmodule TransmissionManager.TorrentsLive.Component do
     max_speed_up = Enum.max(assigns.up_speeds, fn -> 0.0 end)
     max_speed_down = Enum.max(assigns.down_speeds, fn -> 0.0 end)
 
-    height = 50
+    height = 10
     width = 300
-    columns = 100
+    columns = 500
     column_width = width / columns
 
     params = %{
@@ -90,7 +90,7 @@ defmodule TransmissionManager.TorrentsLive.Component do
 
     ~H"""
     <div class="flex flex-row">
-      <div class="svg-container basis-1/1">
+      <div class="svg-container basis-full">
         <svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox={"0 0 #{@width} #{@height}"}>
           <rect
             :for={{speed, col} <- Enum.with_index(@up_speeds)}
@@ -108,7 +108,7 @@ defmodule TransmissionManager.TorrentsLive.Component do
             width={@column_width}
             height={speed * @height_factor_down}
             fill="red"
-            fill-opacity="1"
+            fill-opacity="0.5"
           />
         </svg>
       </div>

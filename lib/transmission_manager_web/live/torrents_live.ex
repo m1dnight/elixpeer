@@ -56,8 +56,6 @@ defmodule TransmissionManagerWeb.TorrentsLive do
     {:noreply, socket}
   end
 
-  @spec handle_info({:new_torrents, %{:torrents => any(), optional(any()) => any()}}, map()) ::
-          {:noreply, any()}
   def handle_info({:new_torrents, new_state}, socket) do
     # order the torrents
     socket =
