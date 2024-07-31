@@ -1,5 +1,6 @@
 # credo:disable-for-this-file Credo.Check.Readability.Specs
 defmodule TransmissionManagerWeb.TorrentsLive do
+  alias TransmissionManager.TransmissionConnection.SpeedStats
   use TransmissionManagerWeb, :live_view
   alias Phoenix.PubSub
   require Logger
@@ -8,15 +9,13 @@ defmodule TransmissionManagerWeb.TorrentsLive do
   def mount(_params, _session, socket) do
     # subscribe for updates on the torrentlist
     PubSub.subscribe(TransmissionManager.PubSub, "torrents")
+    PubSub.subscribe(TransmissionManager.PubSub, "speed_stats")
 
     {:ok,
      assign(socket,
        torrents: [],
        ordering: :oldest_first,
-       down_speeds: [],
-       up_speeds: [],
-       current_down_speed: 0.0,
-       current_up_speed: 0.0
+       speed_stats: SpeedStats.new()
      )}
   end
 
@@ -39,9 +38,7 @@ defmodule TransmissionManagerWeb.TorrentsLive do
   end
 
   def handle_event("order_" <> order, _, socket) do
-    order =
-      order
-      |> String.to_existing_atom()
+    order = String.to_existing_atom(order)
 
     socket =
       socket
@@ -51,54 +48,50 @@ defmodule TransmissionManagerWeb.TorrentsLive do
     {:noreply, socket}
   end
 
-  def handle_event(event, value, socket) do
-    IO.puts("event: #{inspect(event)} #{inspect(value)} ")
+  def handle_event(_event, _value, socket) do
     {:noreply, socket}
   end
 
-  def handle_info({:new_torrents, new_state}, socket) do
+  def handle_info({:new_torrents, torrents}, socket) do
     # order the torrents
     socket =
       socket
-      |> assign(new_state)
+      |> assign(torrents: torrents)
       |> apply_ordering()
 
     {:noreply, socket}
   end
 
+  def handle_info({:speed_stats, %SpeedStats{} = stats}, socket) do
+    {:noreply, assign(socket, speed_stats: stats)}
+  end
+
   #############################################################################
   # Helpers
 
+  # orders the torrents according to the current ordering
   defp apply_ordering(socket) do
     torrents = socket.assigns.torrents
     order = socket.assigns.ordering
-
-    torrents = order_torrents(torrents, order)
-
-    socket = assign(socket, torrents: torrents)
-
-    socket
+    assign(socket, torrents: order_torrents(torrents, order))
   end
 
-  defp order_torrents(torrents, :ratio_desc) do
-    torrents
-    |> Enum.sort_by(& &1.upload_ratio, :desc)
-  end
+  defp order_torrents(torrents, order) do
+    sorter =
+      case order do
+        :ratio_desc ->
+          [& &1.upload_ratio, :desc]
 
-  defp order_torrents(torrents, :active_first) do
-    torrents
-    |> Enum.sort_by(&(&1.rate_download + &1.rate_upload), :desc)
-  end
+        :active_first ->
+          [&(&1.rate_download + &1.rate_upload), :desc]
 
-  defp order_torrents(torrents, :oldest_first) do
-    torrents
-    |> Enum.sort_by(& &1.added_date, {:asc, DateTime})
-  end
+        :oldest_first ->
+          [& &1.added_date, {:asc, DateTime}]
 
-  defp order_torrents(torrents, :newest_first) do
-    torrents
-    |> Enum.sort_by(& &1.added_date, {:desc, DateTime})
-  end
+        :newest_first ->
+          [& &1.added_date, {:desc, DateTime}]
+      end
 
-  defp order_torrents(torrents, _), do: torrents
+    apply(Enum, :sort_by, [torrents | sorter])
+  end
 end

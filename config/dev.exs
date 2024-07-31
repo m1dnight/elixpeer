@@ -4,7 +4,6 @@ import Config
 # Transmission Login
 config :transmission_manager,
   refresh_rate_ms: 500,
-  # refresh_rate_ms: 500,
   clean_rate_ms: -1,
   dry_run: true,
   rules: [],

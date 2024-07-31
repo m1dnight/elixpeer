@@ -2,6 +2,8 @@
 defmodule TransmissionManager.TorrentsLive.Component do
   use Phoenix.Component
 
+  alias TransmissionManager.TransmissionConnection.SpeedStats
+
   # %{
   #   error: 0,
   #   id: 161,
@@ -60,30 +62,45 @@ defmodule TransmissionManager.TorrentsLive.Component do
     """
   end
 
+  attr :speed_stats, SpeedStats, required: true
+
   def chart(assigns) do
-    # parameters = %{columns = 10
-    # width = 300
-    # height = 100
-    # col_width = width / columns
-    # max_speed = max(1.0, Enum.max(assigns.speed.up, fn -> 0.0 end))}
+    stats = assigns.speed_stats
+    # generate the data series to render
+    upload_speeds =
+      stats.upload_speeds_buckets
+      |> Map.to_list()
+      |> Enum.sort_by(fn {timestamp, _} -> timestamp end, {:desc, DateTime})
+      |> Enum.map(fn {_timestamp, bucket} -> bucket.mean end)
+      |> Enum.take(24 * 14)
 
-    max_speed_up = Enum.max(assigns.up_speeds, fn -> 0.0 end)
-    max_speed_down = Enum.max(assigns.down_speeds, fn -> 0.0 end)
+    download_speeds =
+      stats.download_speeds_buckets
+      |> Map.to_list()
+      |> Enum.sort_by(fn {timestamp, _} -> timestamp end, {:desc, DateTime})
+      |> Enum.map(fn {_timestamp, bucket} -> bucket.mean end)
+      |> Enum.take(24 * 14)
 
+    maximum_upload_speed = Enum.max([1.0 | upload_speeds])
+    maximum_download_speed = Enum.max([1.0 | download_speeds])
+
+    # dimensions of the chart
     height = 10
     width = 300
-    columns = 500
+    columns = Enum.max([1, Enum.count(upload_speeds), Enum.count(download_speeds)])
     column_width = width / columns
+
+    column_height_factor =
+      height / Enum.max([maximum_upload_speed, maximum_download_speed, 1.0])
 
     params = %{
       height: height,
       width: width,
       columns: columns,
       column_width: column_width,
-      height_factor_down: height / max(1.0, max_speed_down),
-      height_factor_up: height / max(1.0, max_speed_up),
-      max_up_speed: max_speed_up,
-      max_down_speed: max_speed_down
+      height_factor: column_height_factor,
+      download_speeds: download_speeds,
+      upload_speeds: upload_speeds
     }
 
     assigns = assign(assigns, params)
@@ -92,23 +109,25 @@ defmodule TransmissionManager.TorrentsLive.Component do
     <div class="flex flex-row">
       <div class="svg-container basis-full">
         <svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox={"0 0 #{@width} #{@height}"}>
+          <!-- Upload bars -->
           <rect
-            :for={{speed, col} <- Enum.with_index(@up_speeds)}
-            x={col * @column_width}
-            y={1 + @height - speed * @height_factor_up}
+            :for={{speed, index} <- Enum.with_index(@download_speeds)}
+            x={index * @column_width}
+            y={1 + @height - speed * @height_factor}
             width={@column_width}
-            height={speed * @height_factor_up}
+            height={speed * @height_factor}
             fill="green"
-            fill-opacity="0.5"
+            fill-opacity="1"
           />
+          <!-- Download bars -->
           <rect
-            :for={{speed, col} <- Enum.with_index(@down_speeds)}
-            x={col * @column_width}
-            y={@height - speed * @height_factor_down}
+            :for={{speed, index} <- Enum.with_index(@upload_speeds)}
+            x={index * @column_width}
+            y={1 + @height - speed * @height_factor}
             width={@column_width}
-            height={speed * @height_factor_down}
+            height={speed * @height_factor}
             fill="red"
-            fill-opacity="0.5"
+            fill-opacity="1"
           />
         </svg>
       </div>
