@@ -1,5 +1,5 @@
 #!/bin/bash
-bin="/app/elixpeer/bin/elixpeer"
+bin="/app/bin/server"
 
 
 # Setup the database.
