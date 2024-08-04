@@ -1,6 +1,6 @@
 <.line_graph
   id="line-chart-1"
-  height={500}
+  height={200}
   width="100%"
   type="area"
   toolbar={true}
@@ -24,6 +24,37 @@
             DateTime.to_unix(&1.date) * 1000,
             Decimal.to_float(&1.avg_download || Decimal.new("0"))
           ]
+        )
+    }
+  ]}
+/>
+
+<.line_graph
+  id="bar-chart-1"
+  height={200}
+  width="100%"
+  type="bar"
+  metric="volume"
+  toolbar={true}
+  colors={["#03CEA4", "#FB4D3D"]}
+  options={%{}}
+  dataset={[
+    %{
+      name: "Uploaded",
+      data:
+        Enum.map(
+          @uploaded,
+          fn [bucket, uploaded, _] -> [bucket, Decimal.to_float(uploaded || Decimal.new("0"))] end
+        )
+    },
+    %{
+      name: "Downloaded",
+      data:
+        Enum.map(
+          @uploaded,
+          fn [bucket, _, downloaded] ->
+            [bucket, Decimal.to_float(downloaded || Decimal.new("0"))]
+          end
         )
     }
   ]}

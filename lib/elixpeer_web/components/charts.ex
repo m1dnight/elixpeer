@@ -14,6 +14,7 @@ defmodule ElixpeerWeb.Components.Charts do
   attr :categories, :list, default: []
   attr :options, :map, default: %{}
   attr :colors, :list, default: []
+  attr :metric, :string, default: "rate"
 
   @spec line_graph(map()) :: Phoenix.LiveView.Rendered.t()
   def line_graph(assigns) do
@@ -34,6 +35,7 @@ defmodule ElixpeerWeb.Components.Charts do
       }
       data-series={Jason.encode!(@dataset)}
       data-colors={Jason.encode!(@colors)}
+      data-metric={@metric}
     >
     </div>
     """

@@ -30,25 +30,50 @@ Hooks.Chart = {
     const opts = JSON.parse(this.el.dataset.opts);
     const seriesData = JSON.parse(this.el.dataset.series);
     const colorsData = JSON.parse(this.el.dataset.colors);
+    const metricData = this.el.dataset.metric;
 
-    function getReadableFileSizeString(fileSizeInBytes, index) {
-      var i = -1;
-      var byteUnits = [
-        " kbps",
-        " Mbps",
-        " Gbps",
-        " Tbps",
-        "Pbps",
-        "Ebps",
-        "Zbps",
-        "Ybps",
-      ];
-      do {
-        fileSizeInBytes = fileSizeInBytes / 1024;
-        i++;
-      } while (fileSizeInBytes > 1024);
 
-      return Math.max(fileSizeInBytes, 0.1).toFixed(1) + byteUnits[i];
+    console.log(seriesData);
+    var labelFormatter = function (val, index) {
+      return val;
+    };
+
+    if (metricData === "volume") {
+      labelFormatter = function (fileSizeInBytes, index) {
+        if(fileSizeInBytes === 0) {
+          return "0";
+        }
+        var i = -1;
+        var byteUnits = [" KB", " MB", " GB", " TB", "PB", "EB", "ZB", "YB"];
+        do {
+          fileSizeInBytes = fileSizeInBytes / 1024;
+          i++;
+        } while (fileSizeInBytes > 1024);
+
+        return Math.max(fileSizeInBytes, 0.1).toFixed(1) + byteUnits[i];
+      };
+    }
+
+    if (metricData === "rate") {
+      labelFormatter = function (fileSizeInBytes, index) {
+        var i = -1;
+        var byteUnits = [
+          " kbps",
+          " Mbps",
+          " Gbps",
+          " Tbps",
+          "Pbps",
+          "Ebps",
+          "Zbps",
+          "Ybps",
+        ];
+        do {
+          fileSizeInBytes = fileSizeInBytes / 1024;
+          i++;
+        } while (fileSizeInBytes > 1024);
+
+        return Math.max(fileSizeInBytes, 0.1).toFixed(1) + byteUnits[i];
+      };
     }
 
     var options = Object.assign(
@@ -76,7 +101,7 @@ Hooks.Chart = {
         colors: colorsData,
         stroke: {
           curve: "smooth",
-          width: 3,
+          width: 1,
         },
         dataLabels: {
           enabled: false,
@@ -106,7 +131,7 @@ Hooks.Chart = {
           labels: {
             offsetX: 14,
             offsetY: -10,
-            formatter: getReadableFileSizeString,
+            formatter: labelFormatter,
           },
           tooltip: {
             enabled: true,
