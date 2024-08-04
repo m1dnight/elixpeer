@@ -6,8 +6,6 @@ defmodule Elixpeer.TorrentActivities do
   alias Elixpeer.Repo
   alias Elixpeer.TorrentActivity
 
-  import Ecto.Query
-
   @doc """
   Inserts a torrent activity into the database.
   """
@@ -24,18 +22,27 @@ defmodule Elixpeer.TorrentActivities do
 
   @spec average_speed() :: list(TorrentActivity.t())
   def average_speed do
-    from(t in TorrentActivity,
-      select: %{
-        date: selected_as(fragment("time_bucket_gapfill('60 minutes', ?)", t.inserted_at), :date),
-        avg_upload: fragment("avg(?)", t.upload),
-        avg_download: fragment("avg(?)", t.download)
-      },
-      where: t.inserted_at > fragment("now() - interval '1 day'"),
-      where: t.inserted_at <= fragment("now()"),
-      group_by: fragment("date"),
-      order_by: fragment("date asc")
-    )
-    |> Repo.all()
+    query = """
+    with avg_per_torrent as (SELECT time_bucket_gapfill('60 minute', inserted_at) as bucket,
+                                    avg(upload)                                   as upload,
+                                    avg(download)                                 as download,
+                                    torrent_id                                    as torrent
+
+                            FROM torrent_activities
+                            WHERE inserted_at > NOW() - INTERVAL '5 days'
+                              and inserted_at <= now()
+                            GROUP BY bucket, torrent_id
+                            ORDER BY bucket DESC)
+    select bucket, sum(upload), sum(download)
+    from avg_per_torrent
+    group by bucket
+    order by bucket desc;
+    """
+
+    case SQL.query!(Elixpeer.Repo, query, []) do
+      %{rows: rows} -> rows
+      _ -> []
+    end
   end
 
   @spec volume() :: list()
