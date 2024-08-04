@@ -6,4 +6,4 @@ bin="/app/bin/server"
 $bin eval "Elixpeer.Release.migrate"
 
 # start the elixir application
-exec "$bin" "start" 
+exec "$bin"
