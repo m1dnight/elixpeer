@@ -94,5 +94,4 @@ USER nobody
 # above and adding an entrypoint. See https://github.com/krallin/tini for details
 # ENTRYPOINT ["/tini", "--"]
 
-# CMD ["bash", "/app/entrypoint.sh"]
-CMD ["bash"]
+CMD ["bash", "/app/entrypoint.sh"]
