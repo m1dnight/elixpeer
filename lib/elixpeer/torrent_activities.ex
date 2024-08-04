@@ -2,6 +2,7 @@ defmodule Elixpeer.TorrentActivities do
   @moduledoc """
   Functions to deal with TorrentActivities in the database.
   """
+  alias Ecto.Adapters.SQL
   alias Elixpeer.Repo
   alias Elixpeer.TorrentActivity
 
@@ -69,7 +70,7 @@ defmodule Elixpeer.TorrentActivities do
     ORDER BY bucket desc;
     """
 
-    case Ecto.Adapters.SQL.query!(Elixpeer.Repo, query, []) do
+    case SQL.query!(Elixpeer.Repo, query, []) do
       %{rows: rows} -> rows
       _ -> []
     end
