@@ -2,8 +2,8 @@ import Config
 
 #############################################################################
 # Transmission Login
-config :transmission_manager,
-  refresh_rate_ms: 500,
+config :elixpeer,
+  refresh_rate_ms: 1000,
   clean_rate_ms: -1,
   dry_run: true,
   rules: [],
@@ -17,13 +17,14 @@ config :transmission_manager,
 # Repo
 
 # Configure your database
-config :transmission_manager, TransmissionManager.Repo,
+config :elixpeer, Elixpeer.Repo,
   username: "postgres",
   password: "postgres",
   hostname: "localhost",
-  database: "transmission_manager_dev",
+  database: "elixpeer",
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
+  log: false,
   pool_size: 10
 
 #############################################################################
@@ -32,7 +33,7 @@ config :transmission_manager, TransmissionManager.Repo,
 # Disable swoosh api client as it is only required for production adapters.
 config :swoosh, :api_client, false
 
-config :transmission_manager, TransmissionManager.Mailer,
+config :elixpeer, Elixpeer.Mailer,
   adapter: Swoosh.Adapters.Postmark,
   api_key: "6d53d319-f3a9-48d2-8bfc-508d866612ca"
 
@@ -45,34 +46,21 @@ config :transmission_manager, TransmissionManager.Mailer,
 # The watchers configuration can be used to run external
 # watchers to your application. For example, we can use it
 # to bundle .js and .css sources.
-config :transmission_manager, TransmissionManagerWeb.Endpoint,
-  # Binding to loopback ipv4 address prevents access from other machines.
-  # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.
+config :elixpeer, ElixpeerWeb.Endpoint,
   http: [ip: {127, 0, 0, 1}, port: 4000],
   check_origin: false,
   code_reloader: true,
   debug_errors: true,
-  secret_key_base: "jcpqD5Yghhb7oyNYHekSeSCTZ2N4SAPX0LBVtLgTtxJADnzd73RWmN2fD9LnnpiW",
+  secret_key_base: "1f1wQ4FadbQQ0ZXKrhcL06krXyc2ahIKm1+TeE4cMo/xpBgaO39oDgAgngfQkeXS",
   watchers: [
-    esbuild: {Esbuild, :install_and_run, [:default, ~w(--sourcemap=inline --watch)]},
-    tailwind: {Tailwind, :install_and_run, [:default, ~w(--watch)]}
+    esbuild: {Esbuild, :install_and_run, [:empty, ~w(--sourcemap=inline --watch)]},
+    tailwind: {Tailwind, :install_and_run, [:empty, ~w(--watch)]}
   ],
   live_reload: [
-    # notify: [
-    #   live_view: [
-    #     ~r"lib/my_app_web/core_components.ex$",
-    #     ~r"lib/my_app_web/(live|components)/.*(ex|heex)$"
-    #   ]
-    # ],
-    # patterns: [
-    #   ~r"priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$",
-    #   ~r"priv/gettext/.*(po)$",
-    #   ~r"lib/transmission_manager_web/(controllers)/.*(ex|heex)$"
-    # ]
     patterns: [
-      ~r"priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$",
+      ~r"priv/static/(?!uploads/).*(js|css|png|jpeg|jpg|gif|svg)$",
       ~r"priv/gettext/.*(po)$",
-      ~r"lib/transmission_manager_web/(controllers|live|components)/.*(ex|heex)$"
+      ~r"lib/elixpeer_web/(controllers|live|components)/.*(ex|heex)$"
     ]
   ]
 
@@ -83,7 +71,7 @@ config :transmission_manager, TransmissionManagerWeb.Endpoint,
 config :logger, :console, format: "[$level] $message\n"
 
 # Enable dev routes for dashboard and mailbox
-config :transmission_manager, dev_routes: true
+config :elixpeer, dev_routes: true
 
 # Set a higher stacktrace during development. Avoid configuring such
 # in production as building large stacktraces may be expensive.

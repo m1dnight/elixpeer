@@ -8,8 +8,8 @@ const path = require("path")
 module.exports = {
   content: [
     "./js/**/*.js",
-    "../lib/transmission_manager_web.ex",
-    "../lib/transmission_manager_web/**/*.*ex"
+    "../lib/elixpeer_web.ex",
+    "../lib/elixpeer_web/**/*.*ex"
   ],
   theme: {
     extend: {

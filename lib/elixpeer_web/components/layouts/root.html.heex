@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" class="[scrollbar-gutter:stable]">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="csrf-token" content={get_csrf_token()} />
+    <link rel="icon" type="image/x-icon" href="/images/favicon.ico" />
+
+    <.live_title suffix=" · Transmission Manager">
+      <%= assigns[:page_title] || "Transmission Manager" %>
+    </.live_title>
+    <link phx-track-static rel="stylesheet" href={~p"/assets/app.css"} />
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts">
+    </script>
+    <script defer phx-track-static type="text/javascript" src={~p"/assets/app.js"}>
+    </script>
+  </head>
+  <body class="dark:bg-slate-800 bg-white antialiased text-gray-900 dark:text-gray-100">
+    <%= @inner_content %>
+  </body>
+</html>

@@ -1,1 +1,1 @@
-call "%~dp0\transmission_manager" eval TransmissionManager.Release.migrate
+call "%~dp0\elixpeer" eval Elixpeer.Release.migrate

@@ -7,11 +7,11 @@
 # General application configuration
 import Config
 
-alias TransmissionManager.Rule
+alias Elixpeer.Rule
 
 #############################################################################
 # Transmission Login
-config :transmission_manager,
+config :elixpeer,
   credentials: %{
     username: System.get_env("TRANSMISSION_USERNAME", "transmission"),
     password: System.get_env("TRANSMISSION_PASSWORD", "transmission"),
@@ -29,26 +29,27 @@ config :transmission_manager,
 
 #############################################################################
 # Repo
-config :transmission_manager,
-  ecto_repos: [TransmissionManager.Repo],
+
+config :elixpeer,
+  ecto_repos: [Elixpeer.Repo],
   generators: [timestamp_type: :utc_datetime]
 
 #############################################################################
 # Swoosh Mails
 
-config :transmission_manager, TransmissionManager.Mailer, adapter: Swoosh.Adapters.Local
+config :elixpeer, Elixpeer.Mailer, adapter: Swoosh.Adapters.Local
 
 #############################################################################
 # HTTP Endpoint
 # Configures the endpoint
-config :transmission_manager, TransmissionManagerWeb.Endpoint,
+config :elixpeer, ElixpeerWeb.Endpoint,
   url: [host: "localhost"],
   adapter: Phoenix.Endpoint.Cowboy2Adapter,
   render_errors: [
-    formats: [html: TransmissionManagerWeb.ErrorHTML, json: TransmissionManagerWeb.ErrorJSON],
+    formats: [html: ElixpeerWeb.ErrorHTML, json: ElixpeerWeb.ErrorJSON],
     layout: false
   ],
-  pubsub_server: TransmissionManager.PubSub,
+  pubsub_server: Elixpeer.PubSub,
   live_view: [signing_salt: "XWsvW5eM"],
   check_origin: :conn
 
@@ -62,14 +63,14 @@ config :transmission_manager, TransmissionManagerWeb.Endpoint,
 #
 # For production it's recommended to configure a different adapter
 # at the `config/runtime.exs`.
-config :transmission_manager, TransmissionManager.Mailer, adapter: Swoosh.Adapters.Local
+config :elixpeer, Elixpeer.Mailer, adapter: Swoosh.Adapters.Local
 
 #############################################################################
 # JavaScript
 # Configure esbuild (the version is required)
 config :esbuild,
   version: "0.17.11",
-  default: [
+  empty: [
     args:
       ~w(js/app.js --bundle --target=es2017 --outdir=../priv/static/assets --external:/fonts/* --external:/images/*),
     cd: Path.expand("../assets", __DIR__),
@@ -81,8 +82,8 @@ config :esbuild,
 
 # Configure tailwind (the version is required)
 config :tailwind,
-  version: "3.3.2",
-  default: [
+  version: "3.4.3",
+  empty: [
     args: ~w(
       --config=tailwind.config.js
       --input=css/app.css

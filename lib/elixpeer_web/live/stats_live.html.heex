@@ -1,0 +1,30 @@
+<.line_graph
+  id="line-chart-1"
+  height={500}
+  width="100%"
+  type="area"
+  toolbar={true}
+  colors={["#03CEA4", "#FB4D3D"]}
+  options={%{}}
+  dataset={[
+    %{
+      name: "Upload",
+      data:
+        Enum.map(
+          @upload_speeds,
+          &[DateTime.to_unix(&1.date) * 1000, Decimal.to_float(&1.avg_upload || Decimal.new("0"))]
+        )
+    },
+    %{
+      name: "Download",
+      data:
+        Enum.map(
+          @upload_speeds,
+          &[
+            DateTime.to_unix(&1.date) * 1000,
+            Decimal.to_float(&1.avg_download || Decimal.new("0"))
+          ]
+        )
+    }
+  ]}
+/>

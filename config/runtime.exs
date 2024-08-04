@@ -12,12 +12,12 @@ import Config
 # If you use `mix release`, you need to explicitly enable the server
 # by passing the PHX_SERVER=true when you start it:
 #
-#     PHX_SERVER=true bin/transmission_manager start
+#     PHX_SERVER=true bin/elixpeer start
 #
 # Alternatively, you can use `mix phx.gen.release` to generate a `bin/server`
 # script that automatically sets the env var above.
 if System.get_env("PHX_SERVER") do
-  config :transmission_manager, TransmissionManagerWeb.Endpoint, server: true
+  config :elixpeer, ElixpeerWeb.Endpoint, server: true
 end
 
 if config_env() == :prod do
@@ -33,7 +33,8 @@ if config_env() == :prod do
     "MAIL_TO_ADDRESS",
     "MAIL_TO_NAME",
     "POSTMARK_API_KEY",
-    "RULESET"
+    "RULESET",
+    "DATABASE_URL"
   ]
 
   optional_env_vars = [
@@ -73,9 +74,21 @@ if config_env() == :prod do
     end)
 
   #############################################################################
+  # Repo
+
+  database_url = Map.get(vars, "DATABASE_URL")
+  maybe_ipv6 = if System.get_env("ECTO_IPV6") in ~w(true 1), do: [:inet6], else: []
+
+  config :elixpeer, Elixpeer.Repo,
+    # ssl: true,
+    url: database_url,
+    pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
+    socket_options: maybe_ipv6
+
+  #############################################################################
   # Transmission Login
 
-  config :transmission_manager,
+  config :elixpeer,
     credentials: %{
       username: Map.get(vars, "TRANSMISSION_USERNAME"),
       password: Map.get(vars, "TRANSMISSION_PASSWORD"),
@@ -92,27 +105,9 @@ if config_env() == :prod do
   #############################################################################
   # Swoosh Mails
 
-  config :transmission_manager, TransmissionManager.Mailer,
+  config :elixpeer, Elixpeer.Mailer,
     adapter: Swoosh.Adapters.Postmark,
     api_key: Map.get(vars, "POSTMARK_API_KEY")
-
-  #############################################################################
-  # Repo
-
-  # database_url =
-  #   System.get_env("DATABASE_URL") ||
-  #     raise """
-  #     environment variable DATABASE_URL is missing.
-  #     For example: ecto://USER:PASS@HOST/DATABASE
-  #     """
-
-  # maybe_ipv6 = if System.get_env("ECTO_IPV6") in ~w(true 1), do: [:inet6], else: []
-
-  # config :transmission_manager, TransmissionManager.Repo,
-  #   # ssl: true,
-  #   url: database_url,
-  #   pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
-  #   socket_options: maybe_ipv6
 
   #############################################################################
   # HTTP Endpoint
@@ -128,7 +123,7 @@ if config_env() == :prod do
   scheme = Map.get(vars, "SCHEME", "http")
   secret_key_base = Map.get(vars, "SECRET_KEY_BASE")
 
-  config :transmission_manager, TransmissionManagerWeb.Endpoint,
+  config :elixpeer, ElixpeerWeb.Endpoint,
     url: [host: host, port: port, scheme: scheme],
     http: [
       ip: {0, 0, 0, 0, 0, 0, 0, 0},

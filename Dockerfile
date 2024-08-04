@@ -86,7 +86,7 @@ ENV MIX_ENV="prod"
 
 # Only copy the final release from the build stage
 COPY entrypoint.sh .
-COPY --from=builder --chown=nobody:root /app/_build/${MIX_ENV}/rel/transmission_manager ./
+COPY --from=builder --chown=nobody:root /app/_build/${MIX_ENV}/rel/elixpeer ./
 USER nobody
 
 # If using an environment that doesn't automatically reap zombie processes, it is

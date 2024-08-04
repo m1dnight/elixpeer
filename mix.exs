@@ -1,9 +1,9 @@
-defmodule TransmissionManager.MixProject do
+defmodule Elixpeer.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :transmission_manager,
+      app: :elixpeer,
       version: "0.1.0",
       elixir: "~> 1.14",
       elixirc_paths: elixirc_paths(Mix.env()),
@@ -18,7 +18,7 @@ defmodule TransmissionManager.MixProject do
   # Type `mix help compile.app` for more information.
   def application do
     [
-      mod: {TransmissionManager.Application, []}
+      mod: {Elixpeer.Application, []}
     ]
   end
 
@@ -60,7 +60,8 @@ defmodule TransmissionManager.MixProject do
       {:propcheck, "~> 1.4", only: [:test, :dev]},
       {:hackney, "~> 1.20"},
       {:nimble_parsec, "~> 1.4.0"},
-      {:size, "~> 0.1.0"}
+      {:size, "~> 0.1.0"},
+      {:typed_ecto_schema, "~> 0.4.1", runtime: false}
     ]
   end
 
@@ -75,11 +76,14 @@ defmodule TransmissionManager.MixProject do
       setup: ["deps.get", "ecto.setup", "assets.setup", "assets.build"],
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
-      # test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
-      test: ["test"],
+      test: ["ecto.drop", "ecto.create --quiet", "ecto.migrate --quiet", "test"],
       "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
-      "assets.build": ["tailwind default", "esbuild default"],
-      "assets.deploy": ["tailwind default --minify", "esbuild default --minify", "phx.digest"]
+      "assets.build": ["tailwind empty", "esbuild empty"],
+      "assets.deploy": [
+        "tailwind empty --minify",
+        "esbuild empty --minify",
+        "phx.digest"
+      ]
     ]
   end
 end

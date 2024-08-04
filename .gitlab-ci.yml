@@ -13,6 +13,10 @@ variables:
   PASS: transmission
   MIX_ENV: "test"
   ELIXIR_IMAGE: "elixir:1.16-otp-25"
+  POSTGRES_DB: "elixpeer_test${MIX_TEST_PARTITION}"
+  POSTGRES_HOST: postgres
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: "postgres"
 
 stages:
   - build
@@ -102,6 +106,8 @@ test:elixir:
   services:
     - name: lscr.io/linuxserver/transmission:latest  
       alias: transmission
+    - name: timescale/timescaledb-ha:pg16
+      alias: postgres
   script:
     - mix test
 

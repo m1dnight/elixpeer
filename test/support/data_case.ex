@@ -1,5 +1,5 @@
-# credo:disable-for-this-file Credo.Check.Readability.Specs
-defmodule TransmissionManager.DataCase do
+# credo:disable-for-this-file
+defmodule Elixpeer.DataCase do
   @moduledoc """
   This module defines the setup for tests requiring
   access to the application's data layer.
@@ -11,27 +11,25 @@ defmodule TransmissionManager.DataCase do
   we enable the SQL sandbox, so changes done to the database
   are reverted at the end of every test. If you are using
   PostgreSQL, you can even run database tests asynchronously
-  by setting `use TransmissionManager.DataCase, async: true`, although
+  by setting `use Elixpeer.DataCase, async: true`, although
   this option is not recommended for other databases.
   """
 
   use ExUnit.CaseTemplate
 
-  alias Ecto.Adapters.SQL.Sandbox
-
   using do
     quote do
-      alias TransmissionManager.Repo
+      alias Elixpeer.Repo
 
       import Ecto
       import Ecto.Changeset
       import Ecto.Query
-      import TransmissionManager.DataCase
+      import Elixpeer.DataCase
     end
   end
 
-  setup _tags do
-    # TransmissionManager.DataCase.setup_sandbox(tags)
+  setup tags do
+    Elixpeer.DataCase.setup_sandbox(tags)
     :ok
   end
 
@@ -40,9 +38,9 @@ defmodule TransmissionManager.DataCase do
   """
   def setup_sandbox(tags) do
     pid =
-      Sandbox.start_owner!(TransmissionManager.Repo, shared: not tags[:async])
+      Ecto.Adapters.SQL.Sandbox.start_owner!(Elixpeer.Repo, shared: not tags[:async])
 
-    on_exit(fn -> Sandbox.stop_owner(pid) end)
+    on_exit(fn -> Ecto.Adapters.SQL.Sandbox.stop_owner(pid) end)
   end
 
   @doc """

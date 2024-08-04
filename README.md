@@ -1,4 +1,4 @@
-# TransmissionManager
+# Elixpeer
 
 To start your Phoenix server:
 
