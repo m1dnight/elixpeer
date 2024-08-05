@@ -4,9 +4,7 @@ defmodule ElixpeerWeb.TorrentsLive do
   alias Phoenix.PubSub
   require Logger
   alias Elixpeer.TorrentsLive.Component
-  import ElixpeerWeb.Components.Pills
   alias Elixpeer.Torrents
-  import ElixpeerWeb.Components.Charts
 
   def mount(_params, _session, socket) do
     # subscribe for updates on the torrentlist

@@ -5,10 +5,6 @@ defmodule ElixpeerWeb.Components.Pills do
   """
   use Phoenix.Component
 
-  alias Phoenix.HTML.Form
-  alias Phoenix.LiveView.JS
-  import ElixpeerWeb.Gettext
-
   attr :type, :string, default: "info"
   slot :inner_block, required: true
 
