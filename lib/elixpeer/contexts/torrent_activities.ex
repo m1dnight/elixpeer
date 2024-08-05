@@ -118,7 +118,7 @@ defmodule Elixpeer.TorrentActivities do
                       ORDER BY inserted_at asc)
     SELECT time_bucket_gapfill('1 hour', inserted_at) AS bucket, sum(total_upload), sum(total_download) as volume
     FROM uploaded
-    WHERE inserted_at > now() - interval '5 day'
+    WHERE inserted_at > now() - interval '2 day'
       and inserted_at <= now()
     GROUP BY bucket
     ORDER BY bucket desc;
