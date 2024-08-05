@@ -114,7 +114,6 @@ defmodule Elixpeer.TorrentActivities do
                                     END
                                 ) AS total_download
                       FROM torrent_activities
-                      WHERE inserted_at > now() - interval '5 day'
                       WINDOW w AS (ORDER BY inserted_at)
                       ORDER BY inserted_at asc)
     SELECT time_bucket_gapfill('1 hour', inserted_at) AS bucket, sum(total_upload), sum(total_download) as volume
