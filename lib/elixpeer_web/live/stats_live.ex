@@ -7,10 +7,13 @@ defmodule ElixpeerWeb.StatsLive do
 
   @spec mount(map(), map(), Phoenix.LiveView.Socket.t()) :: {:ok, Phoenix.LiveView.Socket.t()}
   def mount(_params, _session, socket) do
-    upload_speeds = TorrentActivities.average_speed()
-    uploaded = TorrentActivities.volume()
+    socket =
+      socket
+      |> assign_async(:upload_speeds, fn ->
+        {:ok, %{upload_speeds: TorrentActivities.average_speed()}}
+      end)
+      |> assign_async(:uploaded, fn -> {:ok, %{uploaded: TorrentActivities.volume()}} end)
 
-    socket = assign(socket, %{upload_speeds: upload_speeds, uploaded: uploaded})
     {:ok, socket}
   end
 end

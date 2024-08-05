@@ -164,6 +164,8 @@ Hooks.Chart = {
 
     const chart = new ApexCharts(this.el, options);
 
+    console.log("rendering");
+
     chart.render();
   },
 };

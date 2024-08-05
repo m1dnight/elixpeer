@@ -1,10 +1,14 @@
 # credo:disable-for-this-file Credo.Check.Readability.Specs
 defmodule ElixpeerWeb.TorrentsLive do
   use ElixpeerWeb, :live_view
-  alias Phoenix.PubSub
-  require Logger
-  alias Elixpeer.TorrentsLive.Component
+
   alias Elixpeer.Torrents
+  alias Phoenix.PubSub
+
+  require Logger
+
+  import Elixpeer.TorrentsLive.Torrent
+  import ElixpeerWeb.Components.TorrentModal
 
   def mount(_params, _session, socket) do
     # subscribe for updates on the torrentlist
@@ -72,7 +76,7 @@ defmodule ElixpeerWeb.TorrentsLive do
 
   defp modal_data(torrent_id) do
     torrent = Torrents.get(torrent_id)
-    speeds = Elixpeer.TorrentActivities.torrent_speeds(torrent_id)
+    speeds = Elixpeer.TorrentActivities.torrent_volume(torrent_id)
 
     %{torrent: torrent, speeds: speeds}
   end

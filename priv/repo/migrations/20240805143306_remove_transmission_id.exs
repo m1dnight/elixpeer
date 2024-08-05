@@ -6,15 +6,18 @@ defmodule Elixpeer.Repo.Migrations.RemoveTransmissionId do
       remove :transmission_id
     end
 
-    # remove duplicates, if there are any
+    # migrate the torrent foreign key in the activities
     execute """
-    WITH cte AS (SELECT id,
-                        name,
-                        ROW_NUMBER() OVER (PARTITION BY name ORDER BY id desc) AS rn
-                FROM torrents)
-    delete
-    from torrents
-    where id in (select id from cte where rn > 1);
+    create temporary table new_ids as
+    select t1.name, t1.id as original_id, max(t2.id) as new_id
+    from torrents t1
+            join torrents t2 on t1.name = t2.name
+    where t1.id < t2.id
+    group by t1.name, t1.id;
+    """
+
+    execute """
+    delete from torrents where id in (select original_id from new_ids);
     """
 
     # put the index on the name alone

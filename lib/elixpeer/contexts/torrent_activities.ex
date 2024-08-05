@@ -20,6 +20,10 @@ defmodule Elixpeer.TorrentActivities do
     )
   end
 
+  @doc """
+  Get the average total up- and download speeds of all torrents combined
+  per hour of the last 5 days.
+  """
   @spec average_speed() :: list(list())
   def average_speed do
     query = """
@@ -45,6 +49,9 @@ defmodule Elixpeer.TorrentActivities do
     end
   end
 
+  @doc """
+  Get the aggregated up- and download speeds of a specific torrent for the last 2 days.
+  """
   @spec torrent_speeds(integer()) :: list(list())
   def torrent_speeds(torrent_id) do
     query = """
@@ -83,6 +90,9 @@ defmodule Elixpeer.TorrentActivities do
     end
   end
 
+  @doc """
+  Get the aggregated up- and download speeds of all torrents combined for the last 5 days.
+  """
   @spec volume() :: list(list())
   def volume do
     query = """
@@ -107,6 +117,47 @@ defmodule Elixpeer.TorrentActivities do
                       WINDOW w AS (ORDER BY inserted_at)
                       ORDER BY inserted_at asc)
     SELECT time_bucket_gapfill('1 hour', inserted_at) AS bucket, sum(total_upload), sum(total_download) as volume
+    FROM uploaded
+    WHERE inserted_at > now() - interval '5 day'
+      and inserted_at <= now()
+    GROUP BY bucket
+    ORDER BY bucket desc;
+    """
+
+    case SQL.query!(Elixpeer.Repo, query, []) do
+      %{rows: rows} -> rows
+      _ -> []
+    end
+  end
+
+  @doc """
+  Get the aggregated up- and download speeds of all torrents combined for the last 5 days.
+  """
+  @spec torrent_volume(integer()) :: list(list())
+  def torrent_volume(torrent_id) do
+    query = """
+    with uploaded as (SELECT inserted_at,
+                            (
+                                CASE
+                                    WHEN uploaded >= lag(uploaded) OVER w
+                                        THEN uploaded - lag(uploaded) OVER w
+                                    WHEN lag(uploaded) OVER w IS NULL THEN null
+                                    ELSE uploaded
+                                    END
+                                ) AS total_upload,
+                            (
+                                CASE
+                                    WHEN downloaded >= lag(downloaded) OVER w
+                                        THEN downloaded - lag(downloaded) OVER w
+                                    WHEN lag(downloaded) OVER w IS NULL THEN null
+                                    ELSE downloaded
+                                    END
+                                ) AS total_download
+                      FROM torrent_activities
+                      where torrent_id = #{torrent_id}
+                      WINDOW w AS (ORDER BY inserted_at)
+                      ORDER BY inserted_at asc)
+    SELECT time_bucket_gapfill('1 hour', inserted_at) AS bucket, sum(total_upload) as upload, sum(total_download) as download
     FROM uploaded
     WHERE inserted_at > now() - interval '5 day'
       and inserted_at <= now()

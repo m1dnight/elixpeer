@@ -1,24 +1,11 @@
 services:
 
   db:
-    # command: -c config_file=/etc/postgresql.conf
     image: timescale/timescaledb-ha:pg16
     restart: unless-stopped
-    # set shared memory limit when using docker-compose
     shm_size: 128mb
-    # or set shared memory limit when deploy via swarm stack
-    # volumes:
-    #   - ./postgres.conf:/etc/postgresql.conf
-    #   - ./data/pg_data_dir:/var/lib/postgresql/data/
-    #   - ./data/database_backup:/database_backup 
-    #   - ./data/database_archive:/database_archive 
-    #volumes:
-    #  - type: tmpfs
-    #    target: /dev/shm
-    #    tmpfs:
-    #      size: 134217728 # 128*2^20 bytes = 128Mb
     environment:
       POSTGRES_PASSWORD: postgres
       POSTGRES_USER: postgres 
     ports:
-      - "5433:5432"
+      - "5432:5432"
