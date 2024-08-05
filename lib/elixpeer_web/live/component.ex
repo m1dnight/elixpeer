@@ -2,11 +2,96 @@
 defmodule Elixpeer.TorrentsLive.Component do
   use Phoenix.Component
 
+  use ElixpeerWeb, :live_view
+
+  import ElixpeerWeb.Components.Charts
+  import ElixpeerWeb.Components.Pills
+
+  def torrent_modal(assigns) do
+    ~H"""
+    <.modal id="user-modal" show={true}>
+      <%= if @modal_content == nil do %>
+        <p>Nothing to see here</p>
+      <% else %>
+        <div>
+          <!-- Title -->
+          <div class="flex flex-row mb-4">
+            <div class="basis-full text-center text-xl">
+              <%= @modal_content.torrent.name %>
+            </div>
+          </div>
+          <!-- pills -->
+          <div class="flex flex-row justify-center">
+            <.pill :if={@modal_content.torrent.is_finished}>
+              Finished
+            </.pill>
+            <.pill :if={!@modal_content.torrent.is_finished}>
+              Downloading
+            </.pill>
+            <.pill>
+              <%= @modal_content.torrent.percent_done %>%
+            </.pill>
+            <.pill>
+              <%= Size.humanize!(@modal_content.torrent.size_when_done) %>
+            </.pill>
+          </div>
+          <!-- Chart -->
+          <div>
+            <.line_graph
+              id="line-chart-1"
+              height={200}
+              width="100%"
+              type="bar"
+              metric="volume"
+              colors={["#03CEA4", "#FB4D3D"]}
+              options={%{}}
+              dataset={[
+                %{
+                  name: "Upload",
+                  data:
+                    Enum.map(
+                      @modal_content.speeds,
+                      fn [date, upload, _download] ->
+                        [
+                          DateTime.to_unix(date) * 1000,
+                          if(upload != nil, do: Decimal.to_float(upload), else: 0.0)
+                        ]
+                      end
+                    )
+                },
+                %{
+                  name: "Download",
+                  data:
+                    Enum.map(
+                      @modal_content.speeds,
+                      fn [date, _upload, download] ->
+                        [
+                          DateTime.to_unix(date) * 1000,
+                          Decimal.to_float(download || Decimal.new("0"))
+                        ]
+                      end
+                    )
+                }
+              ]}
+            />
+          </div>
+        </div>
+      <% end %>
+    </.modal>
+    """
+  end
+
   def torrent(assigns) do
     ~H"""
     <!-- Title and size -->
     <div class="flex flex-row">
-      <div class="basis-3/4 text-left font-semibold">
+      <div
+        class="basis-3/4 text-left font-semibold"
+        phx-click={
+          JS.push("showing_modal", value: %{torrent_id: @torrent.id})
+          |> show_modal("user-modal")
+        }
+      >
         <%= @torrent.name %>
       </div>
       <div class="basis-1/4 text-right font-light">

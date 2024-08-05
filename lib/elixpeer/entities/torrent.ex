@@ -31,7 +31,6 @@ defmodule Elixpeer.Torrent do
         :seeding
       ]
 
-    field :transmission_id, :integer
     field :upload_ratio, :float
     field :uploaded, :integer
 
@@ -57,7 +56,6 @@ defmodule Elixpeer.Torrent do
       :rate_upload,
       :size_when_done,
       :status,
-      :transmission_id,
       :upload_ratio,
       :uploaded
     ])
@@ -72,7 +70,6 @@ defmodule Elixpeer.Torrent do
       :rate_upload,
       :size_when_done,
       :status,
-      :transmission_id,
       :upload_ratio,
       :uploaded
     ])

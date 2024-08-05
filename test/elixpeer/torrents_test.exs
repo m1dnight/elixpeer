@@ -30,7 +30,6 @@ defmodule Elixpeer.TorrentsTest do
     rate_download: 0,
     rate_upload: 0,
     size_when_done: 1_725_303_631,
-    transmission_id: 1,
     uploaded: 447_100_104
   }
   describe "insert_or_update_torrent" do

@@ -7,6 +7,9 @@ defmodule Elixpeer.Torrents do
   alias Elixpeer.TorrentActivities
   alias Elixpeer.Trackers
 
+
+  import Ecto.Query
+
   # type of the json dictionary coming from the Transmission api
   @type torrent_map :: %{
           :addedDate => integer(),
@@ -52,11 +55,19 @@ defmodule Elixpeer.Torrents do
       rate_upload: torrent_map.rateUpload,
       size_when_done: torrent_map.sizeWhenDone,
       status: parse_status(torrent_map),
-      transmission_id: torrent_map.id,
       upload_ratio: torrent_map.uploadRatio * 1.0,
       uploaded: torrent_map.uploadedEver,
       trackers: parse_trackers(torrent_map)
     }
+  end
+
+  @doc """
+  Returns a torrent based on its transmission id.
+  """
+  @spec get(integer()) :: Torrent.t() | nil
+  def get(torrent_id) do
+    from(t in Torrent, where: t.id == ^torrent_id)
+    |> Repo.one()
   end
 
   @doc """
@@ -73,7 +84,7 @@ defmodule Elixpeer.Torrents do
       |> Torrent.changeset(attrs)
       |> Repo.insert!(
         on_conflict: {:replace_all_except, [:id]},
-        conflict_target: [:name, :transmission_id],
+        conflict_target: [:name],
         returning: true
       )
 

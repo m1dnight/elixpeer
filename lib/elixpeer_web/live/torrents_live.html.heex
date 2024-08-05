@@ -1,4 +1,15 @@
 <!-- Charts -->
+
+<Component.torrent_modal modal_content={@modal_content}/>
+
+<!-- <button phx-click={show_modal("user-modal")}>Click me</button> -->
+<button phx-click={
+  JS.push("showing_modal", value: %{torrent_id: 1})
+  |> show_modal("user-modal")
+}>
+  Click me
+</button>
+
 <div class="flex mt-4 mb-4">
   <div class="flex items-center me-4">
     <input

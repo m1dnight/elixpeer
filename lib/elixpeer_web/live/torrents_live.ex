@@ -4,7 +4,9 @@ defmodule ElixpeerWeb.TorrentsLive do
   alias Phoenix.PubSub
   require Logger
   alias Elixpeer.TorrentsLive.Component
-
+  import ElixpeerWeb.Components.Pills
+  alias Elixpeer.Torrents
+  import ElixpeerWeb.Components.Charts
   def mount(_params, _session, socket) do
     # subscribe for updates on the torrentlist
     PubSub.subscribe(Elixpeer.PubSub, "torrents")
@@ -12,7 +14,8 @@ defmodule ElixpeerWeb.TorrentsLive do
     {:ok,
      assign(socket,
        torrents: [],
-       ordering: :active_first
+       ordering: :active_first,
+       modal_content: modal_data(1)
      )}
   end
 
@@ -45,6 +48,12 @@ defmodule ElixpeerWeb.TorrentsLive do
     {:noreply, socket}
   end
 
+  def handle_event("showing_modal", %{"torrent_id" => torrent_id}, socket) do
+    modal_content = modal_data(torrent_id)
+
+    {:noreply, assign(socket, modal_content: modal_content)}
+  end
+
   def handle_event(_event, _value, socket) do
     {:noreply, socket}
   end
@@ -62,6 +71,11 @@ defmodule ElixpeerWeb.TorrentsLive do
   #############################################################################
   # Helpers
 
+  defp modal_data(torrent_id) do
+    torrent = Torrents.get(torrent_id)
+    speeds = Elixpeer.TorrentActivities.torrent_speeds(torrent_id)
+    %{torrent: torrent, speeds: speeds}
+  end
   # orders the torrents according to the current ordering
   defp apply_ordering(socket) do
     torrents = socket.assigns.torrents
