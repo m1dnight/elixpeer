@@ -7,6 +7,7 @@ defmodule ElixpeerWeb.TorrentsLive do
   import ElixpeerWeb.Components.Pills
   alias Elixpeer.Torrents
   import ElixpeerWeb.Components.Charts
+
   def mount(_params, _session, socket) do
     # subscribe for updates on the torrentlist
     PubSub.subscribe(Elixpeer.PubSub, "torrents")
@@ -15,7 +16,7 @@ defmodule ElixpeerWeb.TorrentsLive do
      assign(socket,
        torrents: [],
        ordering: :active_first,
-       modal_content: modal_data(1)
+       modal_content: nil
      )}
   end
 
@@ -74,8 +75,10 @@ defmodule ElixpeerWeb.TorrentsLive do
   defp modal_data(torrent_id) do
     torrent = Torrents.get(torrent_id)
     speeds = Elixpeer.TorrentActivities.torrent_speeds(torrent_id)
+
     %{torrent: torrent, speeds: speeds}
   end
+
   # orders the torrents according to the current ordering
   defp apply_ordering(socket) do
     torrents = socket.assigns.torrents

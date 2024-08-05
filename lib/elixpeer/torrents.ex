@@ -7,7 +7,6 @@ defmodule Elixpeer.Torrents do
   alias Elixpeer.TorrentActivities
   alias Elixpeer.Trackers
 
-
   import Ecto.Query
 
   # type of the json dictionary coming from the Transmission api

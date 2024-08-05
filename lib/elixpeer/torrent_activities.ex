@@ -45,6 +45,7 @@ defmodule Elixpeer.TorrentActivities do
     end
   end
 
+  @spec torrent_speeds(integer()) :: list(list())
   def torrent_speeds(torrent_id) do
     query = """
     with uploaded as (SELECT inserted_at,

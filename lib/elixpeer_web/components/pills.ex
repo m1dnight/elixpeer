@@ -1,4 +1,8 @@
+# credo:disable-for-this-file Credo.Check.Readability.Specs
 defmodule ElixpeerWeb.Components.Pills do
+  @moduledoc """
+  Components to render information
+  """
   use Phoenix.Component
 
   alias Phoenix.HTML.Form
