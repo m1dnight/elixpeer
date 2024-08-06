@@ -132,6 +132,15 @@ style:elixir:
   script:
     - mix format --check-formatted
 
+style:elixir:
+  extends: 
+    - .stage_lint
+    - .elixir
+  variables:
+    MIX_ENV: "test"
+  script:
+    - mix dialyzer
+
 #-------------------------------------------------------------------------------
 # Docker 
 
