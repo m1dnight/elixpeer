@@ -11,7 +11,7 @@ defmodule ElixpeerWeb.Components.TorrentModal do
 
   def torrent_modal(assigns) do
     ~H"""
-    <.modal id="user-modal" show={true}>
+    <.modal id="user-modal">
       <%= if @modal_content == nil do %>
         <p>Nothing to see here</p>
       <% else %>

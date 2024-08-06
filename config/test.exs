@@ -26,7 +26,7 @@ config :elixpeer, Elixpeer.Repo,
     System.get_env("POSTGRES_DB") || "elixpeer_test#{System.get_env("MIX_TEST_PARTITION")}",
   hostname: System.get_env("POSTGRES_HOST") || "localhost",
   pool: Ecto.Adapters.SQL.Sandbox,
-  port: String.to_integer(System.get_env("POSTGRES_TEST_PORT") || "5432"),
+  port: 5432,
   pool_size: System.schedulers_online() * 2
 
 # We don't run a server during test. If one is required,
