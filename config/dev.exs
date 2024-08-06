@@ -3,7 +3,7 @@ import Config
 #############################################################################
 # Transmission Login
 config :elixpeer,
-  refresh_rate_ms: 10000000,
+  refresh_rate_ms: 10_000_000,
   clean_rate_ms: -1,
   dry_run: true,
   rules: [],
@@ -22,7 +22,7 @@ config :elixpeer, Elixpeer.Repo,
   password: "postgres",
   hostname: "localhost",
   database: "elixpeer",
-  port: 5433,
+  port: 5432,
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
   # log: false,

@@ -9,10 +9,9 @@ defmodule ElixpeerWeb.StatsLive do
   def mount(_params, _session, socket) do
     socket =
       socket
-      |> assign_async(:upload_speeds, fn ->
-        {:ok, %{upload_speeds: TorrentActivities.average_speed()}}
+      |> assign_async(:activity, fn ->
+        {:ok, %{activity: TorrentActivities.torrent_activities()}}
       end)
-      |> assign_async(:uploaded, fn -> {:ok, %{uploaded: TorrentActivities.volume()}} end)
 
     {:ok, socket}
   end
