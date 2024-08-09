@@ -86,11 +86,22 @@ defmodule Elixpeer.TransmissionConnection do
   end
 
   defp get_torrents_from_transmission do
-    Enum.map(Transmission.get_torrents(), &Torrents.from_map/1)
+    Transmission.get_torrents()
   end
 
   defp schedule_sync(delay \\ Application.get_env(:elixpeer, :refresh_rate_ms)) do
     Process.send_after(self(), :scheduled_sync, delay)
+  end
+
+  defp store_torrent(torrent_map) do
+    # # convert to a map
+    # torrent_attrs = Torrents.from_map(torrent_map)
+
+    # # insert the trackers
+    # trackers = Enum.map(torrent_map.trackers, &Trackers.upsert/1)
+
+    # # insert the torrent
+    # Torrents.upsert(torrent_attrs)
   end
 
   @spec transmission_arguments() :: [String.t()]

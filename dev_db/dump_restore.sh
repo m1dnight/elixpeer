@@ -23,22 +23,26 @@ sed -i -E \
 roles.sql;
 
 
-pg_dump -d "$SOURCE" \
-  --format=plain \
-  --quote-all-identifiers \
-  --no-tablespaces \
-  --no-owner \
-  --no-privileges \
-  --file=dump.sql; 
+# pg_dump -d "$SOURCE" \
+#   --format=plain \
+#   --quote-all-identifiers \
+#   --no-tablespaces \
+#   --no-owner \
+#   --no-privileges \
+#   --file=dump.sql; 
 
-psql $SOURCE -c "SELECT extversion FROM pg_extension WHERE extname = 'timescaledb';"
-psql $TARGET -c "SELECT extversion FROM pg_extension WHERE extname = 'timescaledb';"
+
 
 # # psql $SOURCE -c "ALTER EXTENSION timescaledb UPDATE TO '2.16.0';"
 # # psql $TARGET -c "ALTER EXTENSION timescaledb UPDATE TO '2.16.0';"
 
 psql $TARGET_PSQL -c "drop database if exists $DB_NAME;";
 psql $TARGET_PSQL -c "create database $DB_NAME;";
+
+
+psql $TARGET $DB_NAME -c "ALTER EXTENSION timescaledb UPDATE TO '2.16.0';"
+psql $SOURCE $DB_NAME -c "SELECT extversion FROM pg_extension WHERE extname = 'timescaledb';"
+psql $TARGET $DB_NAME -c "SELECT extversion FROM pg_extension WHERE extname = 'timescaledb';"
 
 psql $TARGET -v ON_ERROR_STOP=1 --echo-errors \
     -f roles.sql \

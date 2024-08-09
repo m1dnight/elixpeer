@@ -4,10 +4,55 @@ defmodule Elixpeer.Torrents do
   """
   alias Elixpeer.Repo
   alias Elixpeer.Torrent
-  alias Elixpeer.TorrentActivities
-  alias Elixpeer.Trackers
 
   import Ecto.Query
+
+  #############################################################################
+  # Get
+
+  @doc """
+  Returns a torrent based on its transmission id.
+  """
+  @spec get(integer()) :: Torrent.t() | nil
+  def get(torrent_id) do
+    from(t in Torrent, where: t.id == ^torrent_id)
+    |> Repo.one()
+  end
+
+  @spec list :: Torrent.t()
+  def list do
+    Repo.all(Torrent)
+    |> Repo.preload(:trackers)
+  end
+
+  #############################################################################
+  # Insert
+
+  @doc """
+  Inserts the torrent into the database, updating if necessary.
+  """
+  @spec upsert(map()) :: Torrent.t()
+  def upsert(attrs) do
+    %Torrent{}
+    |> Torrent.changeset(attrs)
+    |> Repo.insert!(
+      on_conflict: {:replace_all_except, [:id]},
+      conflict_target: [:name],
+      returning: true
+    )
+
+    # # insert the activity
+    # TorrentActivities.insert(%{
+    #   torrent_id: torrent.id,
+    #   upload: attrs.rate_upload,
+    #   download: attrs.rate_download,
+    #   uploaded: attrs.uploaded,
+    #   downloaded: attrs.downloaded
+    # })
+  end
+
+  #############################################################################
+  # Parsing
 
   # type of the json dictionary coming from the Transmission api
   @type torrent_map :: %{
@@ -59,54 +104,6 @@ defmodule Elixpeer.Torrents do
       trackers: parse_trackers(torrent_map)
     }
   end
-
-  @doc """
-  Returns a torrent based on its transmission id.
-  """
-  @spec get(integer()) :: Torrent.t() | nil
-  def get(torrent_id) do
-    from(t in Torrent, where: t.id == ^torrent_id)
-    |> Repo.one()
-  end
-
-  @doc """
-  Inserts the torrent into the database, updating if necessary.
-  """
-  @spec upsert(map()) :: Torrent.t()
-  def upsert(attrs) do
-    # insert the trackers first
-    trackers = Enum.map(attrs.trackers, &Trackers.upsert/1)
-    attrs = Map.put(attrs, :trackers, trackers)
-
-    torrent =
-      %Torrent{}
-      |> Torrent.changeset(attrs)
-      |> Repo.insert!(
-        on_conflict: {:replace_all_except, [:id]},
-        conflict_target: [:name],
-        returning: true
-      )
-
-    # insert the activity
-    TorrentActivities.insert(%{
-      torrent_id: torrent.id,
-      upload: attrs.rate_upload,
-      download: attrs.rate_download,
-      uploaded: attrs.uploaded,
-      downloaded: attrs.downloaded
-    })
-
-    torrent
-  end
-
-  @spec list :: Torrent.t()
-  def list do
-    Repo.all(Torrent)
-    |> Repo.preload(:trackers)
-  end
-
-  #############################################################################
-  # Helpers
 
   @spec parse_status(torrent_map()) ::
           :stopped
