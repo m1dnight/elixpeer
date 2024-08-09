@@ -8,7 +8,6 @@ defmodule Elixpeer.Torrent do
 
   alias Elixpeer.Torrent
   alias Elixpeer.TorrentActivity
-  alias Elixpeer.Trackers
 
   typed_schema "torrents" do
     field :activity_date, :naive_datetime
@@ -74,14 +73,6 @@ defmodule Elixpeer.Torrent do
       :upload_ratio,
       :uploaded,
     ])
-    |> Ecto.Changeset.put_assoc(:trackers, parse_trackers(params))
-  end
-
-  # based on the attributes, inserts and gets the trackers
-  defp parse_trackers(params) do
-    Map.get(params, :trackers, [])
-    |> Enum.map(fn tracker_attrs ->
-      Trackers.upsert(tracker_attrs)
-    end)
+    |> Ecto.Changeset.put_assoc(:trackers, params.trackers)
   end
 end

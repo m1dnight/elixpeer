@@ -4,6 +4,7 @@ defmodule Elixpeer.Torrents do
   """
   alias Elixpeer.Repo
   alias Elixpeer.Torrent
+  alias Elixpeer.Trackers
 
   import Ecto.Query
 
@@ -33,6 +34,11 @@ defmodule Elixpeer.Torrents do
   """
   @spec upsert(map()) :: Torrent.t()
   def upsert(attrs) do
+    # insert the trackers first
+    trackers = Enum.map(attrs.trackers, &Trackers.upsert/1)
+    attrs = Map.put(attrs, :trackers, trackers)
+
+    # upsert the torrent
     %Torrent{}
     |> Torrent.changeset(attrs)
     |> Repo.insert!(

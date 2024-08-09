@@ -11,16 +11,16 @@ defmodule Elixpeer.TorrentsTest do
     added_date: ~U[2024-07-27 20:39:03Z],
     trackers: [
       %{
-        announce: "https://tracker.torrentleech.org/a/952d8aa3839094775edb93effdc7f0ae/announce",
-        scrape: "https://tracker.torrentleech.org/a/952d8aa3839094775edb93effdc7f0ae/scrape",
+        announce: "https://tracker.com/announce",
+        scrape: "https://tracker.com/scrape",
         tier: 0,
-        sitename: "torrentleech"
+        sitename: "tracker.com"
       },
       %{
-        announce: "https://tracker.tleechreload.org/a/952d8aa3839094775edb93effdc7f0ae/announce",
-        scrape: "https://tracker.tleechreload.org/a/952d8aa3839094775edb93effdc7f0ae/scrape",
+        announce: "https://tracker2.com/announce",
+        scrape: "https://tracker2.com/scrape",
         tier: 0,
-        sitename: "tleechreload"
+        sitename: "tracker2.com"
       }
     ],
     activity_date: ~U[2024-08-02 20:22:15Z],
@@ -44,11 +44,20 @@ defmodule Elixpeer.TorrentsTest do
       result1 = Torrents.upsert(@torrent_attrs)
       result2 = Torrents.upsert(@torrent_attrs)
 
-      assert Torrents.list() == [result1]
+
+      IO.inspect Torrents.list()
+      assert Torrents.list() == [result2]
     end
 
     test "inserts trackers too" do
       result = Torrents.upsert(@torrent_attrs)
+
+      assert Enum.count(Trackers.list()) == 2
+    end
+
+    test "inserts trackers too, without duplicates" do
+      _result1 = Torrents.upsert(@torrent_attrs)
+      _result2 = Torrents.upsert(@torrent_attrs)
 
       assert Enum.count(Trackers.list()) == 2
     end
