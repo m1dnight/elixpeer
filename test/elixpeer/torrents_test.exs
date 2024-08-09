@@ -9,7 +9,20 @@ defmodule Elixpeer.TorrentsTest do
     status: :seeding,
     upload_ratio: 0.2591,
     added_date: ~U[2024-07-27 20:39:03Z],
-    trackers: [],
+    trackers: [
+      %{
+        announce: "https://tracker.torrentleech.org/a/952d8aa3839094775edb93effdc7f0ae/announce",
+        scrape: "https://tracker.torrentleech.org/a/952d8aa3839094775edb93effdc7f0ae/scrape",
+        tier: 0,
+        sitename: "torrentleech"
+      },
+      %{
+        announce: "https://tracker.tleechreload.org/a/952d8aa3839094775edb93effdc7f0ae/announce",
+        scrape: "https://tracker.tleechreload.org/a/952d8aa3839094775edb93effdc7f0ae/scrape",
+        tier: 0,
+        sitename: "tleechreload"
+      }
+    ],
     activity_date: ~U[2024-08-02 20:22:15Z],
     downloaded: 1_725_303_631,
     is_finished: false,
@@ -32,6 +45,12 @@ defmodule Elixpeer.TorrentsTest do
       result2 = Torrents.upsert(@torrent_attrs)
 
       assert Torrents.list() == [result1]
+    end
+
+    test "inserts trackers too" do
+      result = Torrents.upsert(@torrent_attrs)
+
+      assert Enum.count(Trackers.list()) == 2
     end
 
     # test "insert new torrent inserts trackers" do
