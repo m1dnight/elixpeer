@@ -2,7 +2,6 @@ defmodule Elixpeer.TorrentActivities do
   @moduledoc """
   Functions to deal with TorrentActivities in the database.
   """
-  alias Ecto.Adapters.SQL
   alias Elixpeer.Repo
   alias Elixpeer.TorrentActivity
 
@@ -16,10 +15,10 @@ defmodule Elixpeer.TorrentActivities do
   @doc """
   Inserts a torrent activity into the database.
   """
-  @spec insert(map()) :: {:ok, TorrentActivity.t()} | {:ok, :duplicate}
+  @spec insert(map()) :: TorrentActivity.t()
   def insert(attrs) do
     # check if there is an activity that matches this one save for the timestamps.
-    exists? =
+    duplicate =
       from(t in TorrentActivity,
         where: t.torrent_id == ^attrs.torrent_id,
         where: t.uploaded == ^attrs.uploaded,
@@ -27,9 +26,9 @@ defmodule Elixpeer.TorrentActivities do
         where: t.downloaded == ^attrs.downloaded,
         where: t.download == ^attrs.download
       )
-      |> Repo.exists?()
+      |> Repo.one()
 
-    if not exists? do
+    if is_nil(duplicate) do
       activity =
         %TorrentActivity{}
         |> TorrentActivity.changeset(attrs)
@@ -39,9 +38,9 @@ defmodule Elixpeer.TorrentActivities do
           returning: true
         )
 
-      {:ok, activity}
+      activity
     else
-      {:ok, :duplicate}
+      duplicate
     end
   end
 

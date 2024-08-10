@@ -8,6 +8,7 @@ defmodule Elixpeer.Torrent do
 
   alias Elixpeer.Torrent
   alias Elixpeer.TorrentActivity
+  alias Elixpeer.Trackers
 
   typed_schema "torrents" do
     field :activity_date, :naive_datetime
@@ -34,7 +35,9 @@ defmodule Elixpeer.Torrent do
     field :upload_ratio, :float
     field :uploaded, :integer
 
-    many_to_many :trackers, Elixpeer.Tracker, join_through: "torrents_trackers"
+    many_to_many :trackers, Elixpeer.Tracker,
+      join_through: "torrents_trackers",
+      on_replace: :delete
 
     has_many :torrent_activities, TorrentActivity
 
@@ -57,7 +60,7 @@ defmodule Elixpeer.Torrent do
       :size_when_done,
       :status,
       :upload_ratio,
-      :uploaded,
+      :uploaded
     ])
     |> validate_required([
       :activity_date,
@@ -71,8 +74,15 @@ defmodule Elixpeer.Torrent do
       :size_when_done,
       :status,
       :upload_ratio,
-      :uploaded,
+      :uploaded
     ])
-    |> Ecto.Changeset.put_assoc(:trackers, params.trackers)
+    |> Ecto.Changeset.put_assoc(:trackers, parse_trackers(params))
+  end
+
+
+  defp parse_trackers(params) do
+    params
+    |> Map.get(:trackers, [])
+    |> Enum.map(&Trackers.upsert/1)
   end
 end

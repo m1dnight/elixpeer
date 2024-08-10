@@ -1,7 +1,7 @@
 defmodule ElixpeerWeb.StatsLive do
   use ElixpeerWeb, :live_view
 
-  alias Elixpeer.TorrentActivities
+  alias Elixpeer.Statistics
 
   import ElixpeerWeb.Components.Charts
 
@@ -10,7 +10,7 @@ defmodule ElixpeerWeb.StatsLive do
     socket =
       socket
       |> assign_async(:activity, fn ->
-        {:ok, %{activity: TorrentActivities.torrent_activities()}}
+        {:ok, %{activity: Statistics.torrent_activities()}}
       end)
 
     {:ok, socket}

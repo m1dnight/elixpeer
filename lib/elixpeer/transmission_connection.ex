@@ -73,37 +73,37 @@ defmodule Elixpeer.TransmissionConnection do
 
   defp do_sync(state) do
     # update the torrentlist
-    new_torrents = get_torrents_from_transmission()
-
-    # update the torrents in the db
-    torrents = Enum.map(new_torrents, &Torrents.upsert/1)
+    new_torrents =
+      Transmission.get_torrents()
+      |> store_torrents()
 
     # broadcast the changed torrentlist
-    Phoenix.PubSub.broadcast(PubSub, "torrents", {:new_torrents, torrents})
-    # Phoenix.PubSub.broadcast(PubSub, "speed_stats", {:speed_stats, speed_stats})
+    Phoenix.PubSub.broadcast(PubSub, "torrents", {:new_torrents, new_torrents})
 
-    %{state | torrents: torrents}
+    %{state | torrents: new_torrents}
   end
 
-  defp get_torrents_from_transmission do
-    Transmission.get_torrents()
-  end
-
+  # schedules the next sync task
+  @spec schedule_sync(integer()) :: :ok
   defp schedule_sync(delay \\ Application.get_env(:elixpeer, :refresh_rate_ms)) do
     Process.send_after(self(), :scheduled_sync, delay)
+    :ok
   end
 
-  defp store_torrent(torrent_map) do
-    # # convert to a map
-    # torrent_attrs = Torrents.from_map(torrent_map)
+  # updates the changes in the database
+  @spec store_torrents([map()]) :: [Torrent.t()]
+  defp store_torrents(torrent_maps) do
+    torrent_maps
+    |> Enum.map(fn torrent_map ->
+      # convert to a map
+      torrent_attrs = Torrents.from_map(torrent_map)
 
-    # # insert the trackers
-    # trackers = Enum.map(torrent_map.trackers, &Trackers.upsert/1)
-
-    # # insert the torrent
-    # Torrents.upsert(torrent_attrs)
+      # insert the trackers
+      Torrents.upsert(torrent_attrs)
+    end)
   end
 
+  # returns the arguments to connect to transmission
   @spec transmission_arguments() :: [String.t()]
   defp transmission_arguments do
     credentials = Application.get_env(:elixpeer, :credentials, %{})

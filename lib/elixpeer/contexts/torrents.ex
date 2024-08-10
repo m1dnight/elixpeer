@@ -4,7 +4,7 @@ defmodule Elixpeer.Torrents do
   """
   alias Elixpeer.Repo
   alias Elixpeer.Torrent
-  alias Elixpeer.Trackers
+  alias Elixpeer.TorrentActivities
 
   import Ecto.Query
 
@@ -26,6 +26,16 @@ defmodule Elixpeer.Torrents do
     |> Repo.preload(:trackers)
   end
 
+  @doc """
+  Fetches the activities for the given torrent.
+  """
+  @spec activities(Torrent.t()) :: [TorrentActivity.t()]
+  def activities(torrent) do
+    torrent
+    |> Repo.preload(:torrent_activities, force: true)
+    |> Map.get(:torrent_activities)
+  end
+
   #############################################################################
   # Insert
 
@@ -34,27 +44,34 @@ defmodule Elixpeer.Torrents do
   """
   @spec upsert(map()) :: Torrent.t()
   def upsert(attrs) do
-    # insert the trackers first
-    trackers = Enum.map(attrs.trackers, &Trackers.upsert/1)
-    attrs = Map.put(attrs, :trackers, trackers)
-
     # upsert the torrent
-    %Torrent{}
-    |> Torrent.changeset(attrs)
-    |> Repo.insert!(
-      on_conflict: {:replace_all_except, [:id]},
-      conflict_target: [:name],
-      returning: true
-    )
+    # because an upsert cannot handle assocs, insert the trackers afterwards.
+    torrent =
+      %Torrent{}
+      |> Torrent.changeset(Map.drop(attrs, [:trackers]))
+      |> Repo.insert!(
+        on_conflict: {:replace_all_except, [:id]},
+        conflict_target: [:name],
+        returning: true
+      )
+      |> Repo.preload([:trackers], force: true)
 
-    # # insert the activity
-    # TorrentActivities.insert(%{
-    #   torrent_id: torrent.id,
-    #   upload: attrs.rate_upload,
-    #   download: attrs.rate_download,
-    #   uploaded: attrs.uploaded,
-    #   downloaded: attrs.downloaded
-    # })
+    # upsert the trackers
+    torrent =
+      torrent
+      |> Torrent.changeset(attrs)
+      |> Repo.update!()
+
+    # insert the activity
+    TorrentActivities.insert(%{
+      torrent_id: torrent.id,
+      upload: attrs.rate_upload,
+      download: attrs.rate_download,
+      uploaded: attrs.uploaded,
+      downloaded: attrs.downloaded
+    })
+
+    torrent
   end
 
   #############################################################################

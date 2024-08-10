@@ -76,7 +76,7 @@ defmodule ElixpeerWeb.TorrentsLive do
 
   defp modal_data(torrent_id) do
     torrent = Torrents.get(torrent_id)
-    speeds = Elixpeer.TorrentActivities.torrent_volume(torrent_id)
+    speeds = Elixpeer.Statistics.torrent_volume(torrent_id)
 
     %{torrent: torrent, speeds: speeds}
   end

@@ -3,7 +3,7 @@ import Config
 #############################################################################
 # Transmission Login
 config :elixpeer,
-  refresh_rate_ms: 1000,
+  refresh_rate_ms: 10000,
   clean_rate_ms: 10_000,
   dry_run: true,
   rules: [],

@@ -32,7 +32,7 @@ defmodule Elixpeer.TorrentsTest do
     size_when_done: 1_725_303_631,
     uploaded: 447_100_104
   }
-  describe "insert_or_update_torrent" do
+  describe "upsert/1" do
     test "insert new torrent" do
       # upsert the torrent
       result = Torrents.upsert(@torrent_attrs)
@@ -40,13 +40,11 @@ defmodule Elixpeer.TorrentsTest do
       assert Torrents.list() == [result]
     end
 
-    test "insert duplicate torrent fails" do
+    test "insert duplicate torrent upserts" do
       result1 = Torrents.upsert(@torrent_attrs)
       result2 = Torrents.upsert(@torrent_attrs)
 
-
-      IO.inspect Torrents.list()
-      assert Torrents.list() == [result2]
+      assert result1.id == result2.id
     end
 
     test "inserts trackers too" do
@@ -61,32 +59,5 @@ defmodule Elixpeer.TorrentsTest do
 
       assert Enum.count(Trackers.list()) == 2
     end
-
-    # test "insert new torrent inserts trackers" do
-    #   # upsert the torrent
-    #   result = Torrents.upsert(@torrent_attrs)
-
-    #   assert Torrents.list() == [result]
-    #   assert Enum.sort(Trackers.list()) == Enum.sort(result.trackers)
-    # end
-
-    # test "upsert does not change id" do
-    #   # upsert the torrent
-    #   result1 = Torrents.upsert(@torrent_attrs)
-    #   assert Torrents.list() == [result1]
-
-    #   result2 = Torrents.upsert(@torrent_attrs)
-    #   assert Enum.count(Torrents.list()) == 1
-    #   assert result1.id == result2.id
-    # end
-
-    # test "upsert does not change the trackers" do
-    #   # upsert the torrent
-    #   result1 = Torrents.upsert(@torrent_attrs)
-    #   result2 = Torrents.upsert(@torrent_attrs)
-
-    #   assert Enum.count(Trackers.list()) == 2
-    #   assert result1.trackers == result2.trackers
-    # end
   end
 end

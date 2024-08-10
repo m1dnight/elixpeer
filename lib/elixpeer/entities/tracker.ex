@@ -12,7 +12,9 @@ defmodule Elixpeer.Tracker do
     field :tier, :integer
     field :sitename, :string
 
-    many_to_many :torrents, Elixpeer.Torrent, join_through: "torrents_trackers"
+    many_to_many :torrents, Elixpeer.Torrent,
+      join_through: "torrents_trackers",
+      on_replace: :delete
 
     timestamps(type: :utc_datetime)
   end

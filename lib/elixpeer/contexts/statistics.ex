@@ -3,6 +3,9 @@ defmodule Elixpeer.Statistics do
   Functions to get statistics from the torrents and torrent activities.
   """
 
+  require Logger
+
+  alias Ecto.Adapters.SQL
   @doc """
   Get the average total up- and download speeds and volume of all torrents combined
   per hour.

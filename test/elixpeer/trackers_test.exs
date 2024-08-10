@@ -1,7 +1,6 @@
 defmodule Elixpeer.TrackersTest do
   use Elixpeer.DataCase
 
-  alias Elixpeer.Torrents
   alias Elixpeer.Trackers
 
   @tracker_attrs %{
