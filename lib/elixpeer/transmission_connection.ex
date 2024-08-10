@@ -65,11 +65,6 @@ defmodule Elixpeer.TransmissionConnection do
     {:noreply, %{state | torrents: torrents}}
   end
 
-  def handle_cast(m, state) do
-    IO.inspect(m, label: "Unhandled cast")
-    {:noreply, state}
-  end
-
   #############################################################################
   # Api
 
@@ -97,7 +92,7 @@ defmodule Elixpeer.TransmissionConnection do
   end
 
   # fetches torrents and updates the database
-  defp do_sync() do
+  defp do_sync do
     # update the torrentlist
     {time, new_torrents} =
       Measure.measure(fn ->
