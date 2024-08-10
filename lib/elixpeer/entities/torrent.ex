@@ -79,7 +79,6 @@ defmodule Elixpeer.Torrent do
     |> Ecto.Changeset.put_assoc(:trackers, parse_trackers(params))
   end
 
-
   defp parse_trackers(params) do
     params
     |> Map.get(:trackers, [])

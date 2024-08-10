@@ -50,8 +50,8 @@ defmodule Elixpeer.TorrentActivities do
   @doc """
   Returns a list for all torrent activities.
   """
-  @spec list() :: list(TorrentActivity.t())
-  def list() do
+  @spec list :: list(TorrentActivity.t())
+  def list do
     Repo.all(TorrentActivity)
   end
 end

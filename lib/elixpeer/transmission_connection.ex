@@ -73,9 +73,13 @@ defmodule Elixpeer.TransmissionConnection do
 
   defp do_sync(state) do
     # update the torrentlist
-    new_torrents =
-      Transmission.get_torrents()
-      |> store_torrents()
+    {time, new_torrents} =
+      Measure.measure(fn ->
+        Transmission.get_torrents()
+        |> store_torrents()
+      end)
+
+    Logger.debug("inserted all torrents in #{time} seconds")
 
     # broadcast the changed torrentlist
     Phoenix.PubSub.broadcast(PubSub, "torrents", {:new_torrents, new_torrents})
@@ -86,7 +90,10 @@ defmodule Elixpeer.TransmissionConnection do
   # schedules the next sync task
   @spec schedule_sync(integer()) :: :ok
   defp schedule_sync(delay \\ Application.get_env(:elixpeer, :refresh_rate_ms)) do
-    Process.send_after(self(), :scheduled_sync, delay)
+    if Application.get_env(:elixpeer, :refresh, false) do
+      Process.send_after(self(), :scheduled_sync, delay)
+    end
+
     :ok
   end
 

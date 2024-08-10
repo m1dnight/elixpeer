@@ -15,12 +15,12 @@ defmodule Elixpeer.Trackers do
   """
   @spec upsert(map()) :: Tracker.t()
   def upsert(attrs) do
-      %Tracker{}
-      |> Tracker.changeset(attrs)
-      |> Repo.insert!(
-        on_conflict: {:replace_all_except, [:id]},
-        conflict_target: [:announce, :scrape, :sitename, :tier],
-        returning: true
-      )
+    %Tracker{}
+    |> Tracker.changeset(attrs)
+    |> Repo.insert!(
+      on_conflict: {:replace_all_except, [:id]},
+      conflict_target: [:announce, :scrape, :sitename, :tier],
+      returning: true
+    )
   end
 end

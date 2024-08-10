@@ -1,8 +1,8 @@
 defmodule Elixpeer.TorrentActivitiesTest do
   use Elixpeer.DataCase
 
-  alias Elixpeer.Torrents
   alias Elixpeer.TorrentActivities
+  alias Elixpeer.Torrents
 
   setup do
     # insert a torrent

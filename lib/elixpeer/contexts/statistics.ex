@@ -6,41 +6,43 @@ defmodule Elixpeer.Statistics do
   require Logger
 
   alias Ecto.Adapters.SQL
+
+  # A bucket that holds the statistics for a specific time frame.
+  # Contains total download, upload, and average upload- and download speed.
+  @type statistic_bucket :: %{
+          bucket: DateTime.t(),
+          uploaded: Decimal.t(),
+          downloaded: Decimal.t(),
+          upload_speed_bps: Decimal.t(),
+          download_speed_bps: Decimal.t()
+        }
   @doc """
   Get the average total up- and download speeds and volume of all torrents combined
   per hour.
   """
-  @spec torrent_activities([interval_days: integer()] | []) :: [
-          %{
-            bucket: DateTime.t(),
-            uploaded: Decimal.t(),
-            downloaded: Decimal.t(),
-            upload_speed_bps: Decimal.t(),
-            download_speed_bps: Decimal.t()
-          }
-        ]
+  @spec torrent_activities([interval_days: integer()] | []) :: [statistic_bucket]
   def torrent_activities(opts \\ [interval_days: 5]) do
     opts = Keyword.validate!(opts, interval_days: 5)
     interval_days = opts[:interval_days]
 
     query = """
-    WITH buckets AS (SELECT time_bucket('1 hour', inserted_at)                         AS bucket,
-                      last(uploaded, inserted_at) - first(uploaded, inserted_at)     AS uploaded,
-                      last(downloaded, inserted_at) - first(downloaded, inserted_at) AS downloaded,
-                      torrent_id                                                     AS torrent_id
-               FROM torrent_activities
-               WHERE inserted_at > NOW() - INTERVAL '#{interval_days} day'
-                 AND inserted_at <= NOW()
-               GROUP BY bucket, torrent_id)
-    SELECT time_bucket_gapfill('1 hour', bucket) AS bucky,
-     SUM(uploaded)                         AS uploaded,
-     SUM(downloaded)                       AS downloaded,
-     SUM(uploaded) * 8 / 3600              AS upload_speed_bps,
-     SUM(downloaded) * 8 / 3600            AS download_speed_bps
-    FROM buckets
-    WHERE bucket > NOW() - INTERVAL '#{interval_days}  day'
-    AND bucket <= NOW()
-    GROUP BY bucky;
+    WITH buckets_per_torrent AS (SELECT time_bucket('1 hour', inserted_at)                             AS bucket,
+                                        last(uploaded, inserted_at) - first(uploaded, inserted_at)     AS uploaded,
+                                        last(downloaded, inserted_at) - first(downloaded, inserted_at) AS downloaded,
+                                        torrent_id                                                     AS torrent_id
+                                FROM torrent_activities
+                                WHERE inserted_at > NOW() - INTERVAL '#{interval_days} day'
+                                  AND inserted_at <= NOW()
+                                GROUP BY bucket, torrent_id)
+    SELECT time_bucket_gapfill('1 hour', bucket)     AS bucket_total,
+          COALESCE(SUM(uploaded), 0.0)              AS uploaded,
+          COALESCE(SUM(downloaded), 0.0)            AS downloaded,
+          COALESCE(SUM(uploaded) * 8 / 3600, 0.0)   AS upload_speed_bps,
+          COALESCE(SUM(downloaded) * 8 / 3600, 0.0) AS download_speed_bps
+    FROM buckets_per_torrent
+    WHERE bucket > NOW() - INTERVAL '#{interval_days} day'
+      AND bucket <= NOW()
+    GROUP BY bucket_total;
     """
 
     case SQL.query(Elixpeer.Repo, query, []) do

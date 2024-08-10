@@ -5,6 +5,7 @@ defmodule Elixpeer.Torrents do
   alias Elixpeer.Repo
   alias Elixpeer.Torrent
   alias Elixpeer.TorrentActivities
+  alias Elixpeer.TorrentActivity
 
   import Ecto.Query
 
