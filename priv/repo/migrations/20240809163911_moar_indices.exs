@@ -3,6 +3,35 @@ defmodule Elixpeer.Repo.Migrations.MoarIndices do
 
   def change do
     #############################################################################
+    # Remove duplicate assocs
+
+    # list the unique assocs
+    execute """
+    CREATE TEMPORARY TABLE torrents_trackers_2 AS
+    WITH cte AS (SELECT id,
+                    torrent_id,
+                    tracker_id,
+                    ROW_NUMBER() OVER (PARTITION BY torrent_id, tracker_id ORDER BY torrent_id) AS rn
+             FROM torrents_trackers)
+    SELECT *
+    FROM cte
+    WHERE rn = 1;
+    """
+
+    # delete all assocs
+    execute """
+    DELETE
+    FROM torrents_trackers;
+    """
+
+    # reinsert the unique assocs
+    execute """
+    INSERT INTO torrents_trackers
+    SELECT id, torrent_id, tracker_id
+    FROM torrents_trackers_2;
+    """
+
+    #############################################################################
     # Make torrent activities unique
 
     # create a table with unique measurements
