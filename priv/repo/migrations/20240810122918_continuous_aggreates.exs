@@ -2,7 +2,6 @@ defmodule Elixpeer.Repo.Migrations.ContinuousAggreates do
   use Ecto.Migration
   @disable_ddl_transaction true
 
-
   def change do
     execute(fn ->
       repo().query!("""
