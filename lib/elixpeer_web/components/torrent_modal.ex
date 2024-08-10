@@ -52,12 +52,9 @@ defmodule ElixpeerWeb.Components.TorrentModal do
                   name: "Upload",
                   data:
                     Enum.map(
-                      @modal_content.speeds,
-                      fn [date, upload, _download] ->
-                        [
-                          DateTime.to_unix(date) * 1000,
-                          if(upload != nil, do: Decimal.to_float(upload), else: 0.0)
-                        ]
+                      @modal_content.activity,
+                      fn bucket ->
+                        [DateTime.to_unix(bucket.bucket) * 1000, Decimal.to_float(bucket.uploaded)]
                       end
                     )
                 },
@@ -65,12 +62,9 @@ defmodule ElixpeerWeb.Components.TorrentModal do
                   name: "Download",
                   data:
                     Enum.map(
-                      @modal_content.speeds,
-                      fn [date, _upload, download] ->
-                        [
-                          DateTime.to_unix(date) * 1000,
-                          Decimal.to_float(download || Decimal.new("0"))
-                        ]
+                      @modal_content.activity,
+                      fn bucket ->
+                        [DateTime.to_unix(bucket.bucket) * 1000, Decimal.to_float(bucket.downloaded)]
                       end
                     )
                 }

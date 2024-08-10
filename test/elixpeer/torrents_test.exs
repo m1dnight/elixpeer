@@ -48,7 +48,7 @@ defmodule Elixpeer.TorrentsTest do
     end
 
     test "inserts trackers too" do
-      result = Torrents.upsert(@torrent_attrs)
+      Torrents.upsert(@torrent_attrs)
 
       assert Enum.count(Trackers.list()) == 2
     end
