@@ -26,7 +26,7 @@ config :elixpeer, Elixpeer.Repo,
   port: 5432,
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
-  # log: false,
+  log: false,
   pool_size: 10
 
 #############################################################################

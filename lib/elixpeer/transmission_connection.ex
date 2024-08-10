@@ -33,26 +33,41 @@ defmodule Elixpeer.TransmissionConnection do
   end
 
   @impl true
-  def handle_info(:sync, state) do
-    # update the state and move on
-    {:noreply, do_sync(state)}
+  # trigger a sync task
+  def handle_info(:run_sync, state) do
+    Logger.debug("starting new sync task")
+    # start a task to run the sync
+    Task.start(&do_sync/0)
+
+    {:noreply, state}
   end
 
   @impl true
-  def handle_info(:scheduled_sync, state) do
-    # update the state
-    new_state = do_sync(state)
-
-    # schedule the next update
-    schedule_sync()
-
-    # update the state and move on
-    {:noreply, new_state}
-  end
-
-  @impl true
+  # return the current list of torrents
   def handle_call(:torrents, _from, state) do
     {:reply, state.torrents, state}
+  end
+
+  @impl true
+  # handle the result from the async task with new torrents
+  def handle_cast(:schedule_sync, state) do
+    schedule_sync()
+
+    {:noreply, state}
+  end
+
+  @impl true
+  # handle the result from the async task with new torrents
+  def handle_cast({:inserted_torrents, torrents}, state) do
+    # broadcast the changed torrentlist
+    Phoenix.PubSub.broadcast(PubSub, "torrents", {:new_torrents, torrents})
+
+    {:noreply, %{state | torrents: torrents}}
+  end
+
+  def handle_cast(m, state) do
+    IO.inspect(m, label: "Unhandled cast")
+    {:noreply, state}
   end
 
   #############################################################################
@@ -71,7 +86,18 @@ defmodule Elixpeer.TransmissionConnection do
   #############################################################################
   # Helpers
 
-  defp do_sync(state) do
+  # schedules the next sync task
+  @spec schedule_sync(integer()) :: :ok
+  defp schedule_sync(delay \\ Application.get_env(:elixpeer, :refresh_rate_ms)) do
+    if Application.get_env(:elixpeer, :refresh, false) do
+      Process.send_after(self(), :run_sync, delay)
+    end
+
+    :ok
+  end
+
+  # fetches torrents and updates the database
+  defp do_sync() do
     # update the torrentlist
     {time, new_torrents} =
       Measure.measure(fn ->
@@ -80,21 +106,9 @@ defmodule Elixpeer.TransmissionConnection do
       end)
 
     Logger.debug("inserted all torrents in #{time} seconds")
-
-    # broadcast the changed torrentlist
-    Phoenix.PubSub.broadcast(PubSub, "torrents", {:new_torrents, new_torrents})
-
-    %{state | torrents: new_torrents}
-  end
-
-  # schedules the next sync task
-  @spec schedule_sync(integer()) :: :ok
-  defp schedule_sync(delay \\ Application.get_env(:elixpeer, :refresh_rate_ms)) do
-    if Application.get_env(:elixpeer, :refresh, false) do
-      Process.send_after(self(), :scheduled_sync, delay)
-    end
-
-    :ok
+    # send the torrents back
+    GenServer.cast(__MODULE__, {:inserted_torrents, new_torrents})
+    GenServer.cast(__MODULE__, :schedule_sync)
   end
 
   # updates the changes in the database
