@@ -32,15 +32,13 @@ Hooks.Chart = {
     const colorsData = JSON.parse(this.el.dataset.colors);
     const metricData = this.el.dataset.metric;
 
-
-    console.log(seriesData);
     var labelFormatter = function (val, index) {
       return val;
     };
 
     if (metricData === "volume") {
       labelFormatter = function (fileSizeInBytes, index) {
-        if(fileSizeInBytes === 0) {
+        if (fileSizeInBytes === 0) {
           return "0";
         }
         var i = -1;
@@ -167,6 +165,11 @@ Hooks.Chart = {
     console.log("rendering");
 
     chart.render();
+
+    this.handleEvent("update-dataset", (data) => {
+      console.log("updating dataset");
+      // chart.updateSeries(data.dataset);
+    });
   },
 };
 

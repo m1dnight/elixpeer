@@ -54,7 +54,11 @@ defmodule ElixpeerWeb.TorrentsLive do
   def handle_event("showing_modal", %{"torrent_id" => torrent_id}, socket) do
     modal_content = modal_data(torrent_id)
 
-    {:noreply, assign(socket, modal_content: modal_content)}
+    socket
+    |> push_event("update-dataset", %{})
+    |> assign(modal_content: modal_content)
+
+    {:noreply, socket}
   end
 
   def handle_event(_event, _value, socket) do
