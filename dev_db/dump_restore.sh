@@ -29,13 +29,13 @@ sed -i -E \
 roles.sql;
 
 
-# pg_dump -d "$SOURCE" \
-#   --format=plain \
-#   --quote-all-identifiers \
-#   --no-tablespaces \
-#   --no-owner \
-#   --no-privileges \
-#   --file=dump.sql; 
+pg_dump -d "$SOURCE" \
+  --format=plain \
+  --quote-all-identifiers \
+  --no-tablespaces \
+  --no-owner \
+  --no-privileges \
+  --file=dump.sql; 
 
 
 
