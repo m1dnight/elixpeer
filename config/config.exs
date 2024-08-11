@@ -18,6 +18,7 @@ config :elixpeer,
     host: System.get_env("TRANSMISSION_HOST", "http://localhost:9091/transmission/rpc")
   },
   refresh_rate_ms: 500,
+  refresh: true,
   # refresh_rate_ms: 500,
   clean_rate_ms: 10_000,
   dry_run: true,
