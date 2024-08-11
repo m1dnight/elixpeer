@@ -5,7 +5,7 @@ defmodule Elixpeer.Repo.Migrations.ContinuousAggreates do
   def change do
     execute(fn ->
       repo().query!("""
-      CREATE MATERIALIZED VIEW activity_per_hour_per_torrent
+      CREATE MATERIALIZED VIEW IF NOT EXISTS activity_per_hour_per_torrent
                   (bucket, uploaded, downloaded, torrent_id)
                   WITH (timescaledb.continuous)
       AS
