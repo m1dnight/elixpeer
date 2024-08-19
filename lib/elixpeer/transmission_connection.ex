@@ -36,8 +36,10 @@ defmodule Elixpeer.TransmissionConnection do
   # trigger a sync task
   def handle_info(:run_sync, state) do
     Logger.debug("starting new sync task")
-    # start a task to run the sync
-    Task.start(&do_sync/0)
+
+    # start a task to run the sync, but do not link
+    # if the task fails just let it fail
+    Task.start_link(&do_sync/0)
 
     {:noreply, state}
   end
@@ -61,6 +63,9 @@ defmodule Elixpeer.TransmissionConnection do
   def handle_cast({:inserted_torrents, torrents}, state) do
     # broadcast the changed torrentlist
     Phoenix.PubSub.broadcast(PubSub, "torrents", {:new_torrents, torrents})
+
+    # schedule the next sync
+    schedule_sync()
 
     {:noreply, %{state | torrents: torrents}}
   end
@@ -101,9 +106,9 @@ defmodule Elixpeer.TransmissionConnection do
       end)
 
     Logger.debug("inserted all torrents in #{time} seconds")
+
     # send the torrents back
     GenServer.cast(__MODULE__, {:inserted_torrents, new_torrents})
-    GenServer.cast(__MODULE__, :schedule_sync)
   end
 
   # updates the changes in the database
