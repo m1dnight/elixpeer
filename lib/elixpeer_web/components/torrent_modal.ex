@@ -7,7 +7,6 @@ defmodule ElixpeerWeb.Components.TorrentModal do
 
   import ElixpeerWeb.CoreComponents
   import ElixpeerWeb.Components.Pills
-  import ElixpeerWeb.Components.Charts
 
   def torrent_modal(assigns) do
     ~H"""

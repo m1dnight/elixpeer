@@ -4,12 +4,9 @@ defmodule Elixpeer.TorrentsLive.Torrent do
 
   use ElixpeerWeb, :live_view
 
-
-
   def torrent(assigns) do
     ~H"""
     <!-- Title and size -->
-
     <div class="flex flex-row">
       <div
         class="basis-3/4 text-left font-semibold"
@@ -37,7 +34,6 @@ defmodule Elixpeer.TorrentsLive.Torrent do
         </span>
         <!-- Age -->
         <span class="bg-blue-100 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-blue-900">
-
         </span>
         <!-- Ratio  and actions-->
         <span class="bg-blue-100 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-blue-900 ">

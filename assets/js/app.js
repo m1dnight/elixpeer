@@ -30,24 +30,63 @@ import {
 
 let Hooks = {};
 
-// build chart
-var chart = null;
-
 Hooks.Chart = {
   mounted() {
     // build the options for this chart
-    var options = defaultOptions;
-    options.chart = defaultChartOptions;
+    var options = Object.assign({}, defaultOptions);
+    options.chart = Object.assign({}, defaultChartOptions);
 
     var chart = new ApexCharts(
       document.querySelector(`#${this.el.id}`),
       options
     );
 
-    console.log(this.el.id);
     chart.render();
 
-    console.log("mounted");
+    this.handleEvent(`update-${this.el.id}`, (data) => {
+      // data is in the form of:
+      // { data_series: [{name: name, data: [[x, y]]}]}
+      console.log("updating chart!");
+      chart.updateSeries(data.data_series);
+    });
+  },
+};
+
+Hooks.VolumeChart = {
+  mounted() {
+    // build the options for this chart
+    var options = Object.assign({}, defaultOptions);
+    options.chart = Object.assign({}, defaultChartOptions);
+    options.yaxis.labels.formatter = volumeFormatter;
+
+    var chart = new ApexCharts(
+      document.querySelector(`#${this.el.id}`),
+      options
+    );
+
+    chart.render();
+
+    this.handleEvent(`update-${this.el.id}`, (data) => {
+      // data is in the form of:
+      // { data_series: [{name: name, data: [[x, y]]}]}
+      chart.updateSeries(data.data_series);
+    });
+  },
+};
+
+Hooks.SpeedChart = {
+  mounted() {
+    // build the options for this chart
+    var options = Object.assign({}, defaultOptions);
+    options.chart = Object.assign({}, defaultChartOptions);
+    options.yaxis.labels.formatter = rateFormatter;
+
+    var chart = new ApexCharts(
+      document.querySelector(`#${this.el.id}`),
+      options
+    );
+
+    chart.render();
 
     this.handleEvent(`update-${this.el.id}`, (data) => {
       // data is in the form of:
@@ -70,10 +109,6 @@ let liveSocket = new LiveSocket("/live", Socket, {
 topbar.config({ barColors: { 0: "#29d" }, shadowColor: "rgba(0, 0, 0, .3)" });
 window.addEventListener("phx:page-loading-start", (_info) => topbar.show(300));
 window.addEventListener("phx:page-loading-stop", (_info) => topbar.hide());
-
-window.addEventListener("phx:update-dataset", (e) => {
-  console.log("not in hook");
-});
 
 // connect if there are any LiveViews on the page
 liveSocket.connect();
