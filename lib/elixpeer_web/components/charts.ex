@@ -36,7 +36,7 @@ defmodule ElixpeerWeb.Components.Charts do
       data-series={Jason.encode!(@dataset)}
       data-colors={Jason.encode!(@colors)}
       data-metric={@metric}
-    >
+    >`
     </div>
     """
   end

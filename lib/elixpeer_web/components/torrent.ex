@@ -4,15 +4,18 @@ defmodule Elixpeer.TorrentsLive.Torrent do
 
   use ElixpeerWeb, :live_view
 
+
+
   def torrent(assigns) do
     ~H"""
     <!-- Title and size -->
+
     <div class="flex flex-row">
       <div
         class="basis-3/4 text-left font-semibold"
         phx-click={
-          JS.push("showing_modal", value: %{torrent_id: @torrent.id})
-          |> show_modal("user-modal")
+          JS.push("request_modal_data", value: %{torrent_id: @torrent.id})
+          |> show_modal("torrent-modal-#{@torrent.id}")
         }
       >
         <%= @torrent.name %>
@@ -34,10 +37,7 @@ defmodule Elixpeer.TorrentsLive.Torrent do
         </span>
         <!-- Age -->
         <span class="bg-blue-100 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-blue-900">
-          <%= Calendar.strftime(@torrent.added_date, "%x") %> (<%= Date.diff(
-            DateTime.utc_now(),
-            @torrent.added_date
-          ) %> days)
+
         </span>
         <!-- Ratio  and actions-->
         <span class="bg-blue-100 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-blue-900 ">

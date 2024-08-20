@@ -67,7 +67,7 @@ defmodule Elixpeer.Statistics do
           COALESCE(SUM(uploaded) * 8 / 3600, 0.0)   AS upload_speed_bps,
           COALESCE(SUM(downloaded) * 8 / 3600, 0.0) AS download_speed_bps
     FROM activity_per_hour_per_torrent
-    WHERE bucket > NOW() - INTERVAL '1 day'
+    WHERE bucket > NOW() - INTERVAL '7 day'
       AND bucket <= NOW()
       AND torrent_id = #{torrent_id}
     GROUP BY bucket_total;

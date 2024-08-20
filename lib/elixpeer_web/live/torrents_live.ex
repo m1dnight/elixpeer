@@ -51,12 +51,14 @@ defmodule ElixpeerWeb.TorrentsLive do
     {:noreply, socket}
   end
 
-  def handle_event("showing_modal", %{"torrent_id" => torrent_id}, socket) do
+  def handle_event("request_modal_data", %{"torrent_id" => torrent_id}, socket) do
     modal_content = modal_data(torrent_id)
 
-    socket
-    |> push_event("update-dataset", %{})
-    |> assign(modal_content: modal_content)
+    event_name = "update-torrent-chart-#{torrent_id}"
+
+    socket =
+      socket
+      |> push_event(event_name, %{data_series: modal_content.data_series})
 
     {:noreply, socket}
   end
@@ -66,7 +68,6 @@ defmodule ElixpeerWeb.TorrentsLive do
   end
 
   def handle_info({:new_torrents, torrents}, socket) do
-    # order the torrents
     socket =
       socket
       |> assign(torrents: torrents)
@@ -82,7 +83,17 @@ defmodule ElixpeerWeb.TorrentsLive do
     torrent = Torrents.get(torrent_id)
     activity = Elixpeer.Statistics.torrent_activities_for(torrent_id)
 
-    %{torrent: torrent, activity: activity}
+    upload_data = Enum.map(activity, &[&1.bucket, Decimal.to_float(&1.uploaded)])
+
+    download_data = Enum.map(activity, &[&1.bucket, Decimal.to_float(&1.downloaded)])
+
+    %{
+      torrent: torrent,
+      data_series: [
+        %{name: "Uploaded", data: upload_data},
+        %{name: "Downloaded", data: download_data}
+      ]
+    }
   end
 
   # orders the torrents according to the current ordering
