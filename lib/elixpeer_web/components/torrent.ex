@@ -9,7 +9,7 @@ defmodule Elixpeer.TorrentsLive.Torrent do
     <!-- Title and size -->
     <div class="flex flex-row">
       <div
-        class="basis-3/4 text-left font-semibold"
+        class="basis-3/4 text-left font-semibold break-all"
         phx-click={
           JS.push("request_modal_data", value: %{torrent_id: @torrent.id})
           |> show_modal("torrent-modal-#{@torrent.id}")
