@@ -1,4 +1,6 @@
 #!/bin/bash
+
+set -e 
 # ssh -L 0.0.0.0:5433:127.0.0.1:5432 administrator@torrents.localdomain -N -v -v
 
 # local to remote
@@ -7,7 +9,7 @@
 # TARGET_PSQL=postgres://postgres:postgres@localhost:5433/postgres 
 
 # remote to local
-SOURCE=postgres://postgres:postgres@localhost:5433/elixpeer
+SOURCE=postgres://postgres:postgres@localhost:5434/elixpeer
 TARGET=postgres://postgres:postgres@localhost:5432/elixpeer 
 TARGET_PSQL=postgres://postgres:postgres@localhost:5432/postgres 
 

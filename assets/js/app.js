@@ -34,7 +34,7 @@ Hooks.Chart = {
   mounted() {
     // build the options for this chart
     var options = Object.assign({}, defaultOptions);
-    options.chart = Object.assign({}, defaultChartOptions);
+    options.chart = Object.assign(defaultChartOptions, {type: "bar"});
 
     var chart = new ApexCharts(
       document.querySelector(`#${this.el.id}`),
@@ -47,6 +47,7 @@ Hooks.Chart = {
       // data is in the form of:
       // { data_series: [{name: name, data: [[x, y]]}]}
       console.log("updating chart!");
+      console.log(data.data_series);
       chart.updateSeries(data.data_series);
     });
   },

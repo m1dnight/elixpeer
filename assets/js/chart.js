@@ -77,6 +77,8 @@ const defaultOptions = {
       format: "dd MMM yyyy",
     },
     theme: "dark",
+    intersect: false,
+    shared: true
   },
   legend: {
     position: "top",
