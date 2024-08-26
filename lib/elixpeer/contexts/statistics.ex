@@ -26,12 +26,12 @@ defmodule Elixpeer.Statistics do
     interval_days = opts[:interval_days]
 
     query = """
-    SELECT time_bucket_gapfill('1 hour', bucket)     AS bucket_total,
+    SELECT time_bucket_gapfill('1 day', bucket)     AS bucket_total,
           COALESCE(SUM(uploaded), 0.0)              AS uploaded,
           COALESCE(SUM(downloaded), 0.0)            AS downloaded,
           COALESCE(SUM(uploaded) * 8 / 3600, 0.0)   AS upload_speed_bps,
           COALESCE(SUM(downloaded) * 8 / 3600, 0.0) AS download_speed_bps
-    FROM activity_per_hour_per_torrent
+    FROM activity_per_day_per_torrent
     WHERE bucket > NOW() - INTERVAL '#{interval_days} day'
       AND bucket <= NOW()
     GROUP BY bucket_total;

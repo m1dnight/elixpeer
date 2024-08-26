@@ -34,7 +34,7 @@ Hooks.Chart = {
   mounted() {
     // build the options for this chart
     var options = Object.assign({}, defaultOptions);
-    options.chart = Object.assign(defaultChartOptions, {type: "bar"});
+    options.chart = Object.assign(defaultChartOptions, {type: "bar", stacked: false});
 
     var chart = new ApexCharts(
       document.querySelector(`#${this.el.id}`),

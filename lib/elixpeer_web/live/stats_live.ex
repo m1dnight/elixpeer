@@ -11,7 +11,7 @@ defmodule ElixpeerWeb.StatsLive do
     socket =
       socket
       |> assign(:activity, AsyncResult.loading())
-      |> start_async(:activity, fn -> Statistics.torrent_activities(interval_days: 30) end)
+      |> start_async(:activity, fn -> Statistics.torrent_activities(interval_days: 90) end)
 
     # |> assign_async(:activity, fn ->
     #   {:ok, %{activity: Statistics.torrent_activities()}}
