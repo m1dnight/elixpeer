@@ -23,6 +23,7 @@ defmodule Elixpeer.Cleaner do
     ruleset
     |> matching_torrents()
     |> Enum.map(&delete_torrent/1)
+    |> Enum.filter(&(&1 != nil))
   end
 
   @spec matching_torrents(RuleSet.t()) :: [Elixpeer.Torrent.t()]
@@ -38,12 +39,12 @@ defmodule Elixpeer.Cleaner do
   def delete_torrent(torrent) do
     if dryrun?() do
       Logger.warning("would delete torrent  '#{torrent.name}' (#{torrent.id})")
+      nil
     else
       Logger.warning("deleting torrent  '#{torrent.name}' (#{torrent.id})")
       Transmission.remove_torrent(torrent.id, true)
+      torrent
     end
-
-    torrent
   end
 
   #############################################################################
