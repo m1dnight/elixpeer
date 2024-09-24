@@ -20,5 +20,5 @@ defmodule ElixpeerWeb.Gettext do
 
   See the [Gettext Docs](https://hexdocs.pm/gettext) for detailed usage.
   """
-  use Gettext, otp_app: :elixpeer
+  use Gettext.Backend, otp_app: :elixpeer
 end
