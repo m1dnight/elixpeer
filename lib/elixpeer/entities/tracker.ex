@@ -24,6 +24,6 @@ defmodule Elixpeer.Tracker do
   def changeset(tracker, attrs) do
     tracker
     |> cast(attrs, [:announce, :scrape, :tier, :sitename])
-    |> validate_required([:announce, :scrape, :tier, :sitename])
+    |> validate_required([:announce, :tier, :sitename])
   end
 end
