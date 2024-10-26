@@ -28,7 +28,7 @@ defmodule Elixpeer.Cleaner do
 
   @spec matching_torrents(RuleSet.t()) :: [Elixpeer.Torrent.t()]
   def matching_torrents(rule) do
-    TransmissionConnection.get_torrents()
+    TransmissionConnection.get_torrents(forced: true)
     |> Enum.filter(&Matcher.matches?(&1, rule))
   end
 

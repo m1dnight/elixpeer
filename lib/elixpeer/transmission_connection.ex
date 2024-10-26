@@ -46,8 +46,12 @@ defmodule Elixpeer.TransmissionConnection do
 
   @impl true
   # return the current list of torrents
-  def handle_call(:torrents, _from, state) do
-    {:reply, state.torrents, state}
+  def handle_call({:torrents, forced: forced?}, _from, state) do
+    if forced? do
+      {:reply, store_torrents(), state}
+    else
+      {:reply, state.torrents, state}
+    end
   end
 
   @impl true
@@ -73,9 +77,10 @@ defmodule Elixpeer.TransmissionConnection do
   #############################################################################
   # Api
 
-  @spec get_torrents() :: [Torrent.t()]
-  def get_torrents do
-    GenServer.call(__MODULE__, :torrents)
+  @spec get_torrents(Keyword.t()) :: [Torrent.t()]
+  def get_torrents(opts \\ [forced: false]) do
+    forced? = Keyword.get(opts, :forced, false)
+    GenServer.call(__MODULE__, {:torrents, forced: forced?}, 60_000)
   end
 
   @spec force_sync() :: :sync
@@ -101,14 +106,18 @@ defmodule Elixpeer.TransmissionConnection do
     # update the torrentlist
     {time, new_torrents} =
       Measure.measure(fn ->
-        Transmission.get_torrents()
-        |> store_torrents()
+        store_torrents()
       end)
 
     Logger.debug("inserted all torrents in #{time} seconds")
 
     # send the torrents back
     GenServer.cast(__MODULE__, {:inserted_torrents, new_torrents})
+  end
+
+  defp store_torrents do
+    Transmission.get_torrents()
+    |> store_torrents()
   end
 
   # updates the changes in the database
