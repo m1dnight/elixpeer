@@ -3,10 +3,10 @@ bin="/app/bin/server"
 
 
 # Setup the database.
-echo "running migrations"
-$bin eval "Elixpeer.Release.migrate"
+echo "running migrationss"
+/app/bin/elixpeer eval "Elixpeer.Release.migrate"
 echo "done"
 
-# # start the elixir application
-# echo "starting application"
-# exec "$bin"
+# start the elixir application
+echo "starting application"
+exec "$bin"
