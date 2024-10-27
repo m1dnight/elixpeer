@@ -51,6 +51,8 @@ defmodule Elixpeer.Cleaner.Worker do
   defp notify_deleted_torrents([]), do: {:ok, :no_message_sent}
 
   defp notify_deleted_torrents(torrents) do
-    Elixpeer.Notifier.send_notification(:torrent_deleted, torrents)
+    if Application.get_env(:elixpeer, :send_mails, false) do
+      Elixpeer.Notifier.send_notification(:torrent_deleted, torrents)
+    end
   end
 end

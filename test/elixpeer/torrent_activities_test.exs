@@ -19,7 +19,8 @@ defmodule Elixpeer.TorrentActivitiesTest do
       rate_download: 0,
       rate_upload: 0,
       size_when_done: 0,
-      uploaded: 0
+      uploaded: 0,
+      transmission_id: 1
     }
 
     torrent = Torrents.upsert(attrs)

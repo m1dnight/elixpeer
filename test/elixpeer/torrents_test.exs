@@ -8,6 +8,7 @@ defmodule Elixpeer.TorrentsTest do
     name: "PD.True.S01E08.1080p.WEB.H264-BUSSY",
     status: :seeding,
     upload_ratio: 0.2591,
+    transmission_id: 1,
     added_date: ~U[2024-07-27 20:39:03Z],
     trackers: [
       %{

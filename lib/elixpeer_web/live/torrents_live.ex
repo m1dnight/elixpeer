@@ -24,20 +24,35 @@ defmodule ElixpeerWeb.TorrentsLive do
 
   def handle_event("delete_torrent", %{"id" => torrent_id}, socket) do
     Logger.warning("delete torrent #{torrent_id}")
+
     Transmission.remove_torrent(String.to_integer(torrent_id), true)
     {:noreply, socket}
+  catch
+    :exit, _ ->
+      Logger.warning("Timeout on Transmission.remove_torrent")
+      {:noreply, socket}
   end
 
   def handle_event("pause_torrent", %{"id" => torrent_id}, socket) do
     Logger.warning("pause torrent #{torrent_id}")
+
     Transmission.stop_torrents(String.to_integer(torrent_id))
     {:noreply, socket}
+  catch
+    :exit, _ ->
+      Logger.warning("Timeout on Transmission.stop_torrents")
+      {:noreply, socket}
   end
 
   def handle_event("start_torrent", %{"id" => torrent_id}, socket) do
     Logger.warning("start torrent #{torrent_id}")
+
     Transmission.start_torrents(String.to_integer(torrent_id))
     {:noreply, socket}
+  catch
+    :exit, _ ->
+      Logger.warning("Timeout on Transmission.start_torrents")
+      {:noreply, socket}
   end
 
   def handle_event("order_" <> order, _, socket) do

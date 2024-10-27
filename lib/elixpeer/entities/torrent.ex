@@ -20,6 +20,7 @@ defmodule Elixpeer.Torrent do
     field :rate_download, :integer
     field :rate_upload, :integer
     field :size_when_done, :integer
+    field :transmission_id, :integer
 
     field :status, Ecto.Enum,
       values: [
@@ -60,7 +61,8 @@ defmodule Elixpeer.Torrent do
       :size_when_done,
       :status,
       :upload_ratio,
-      :uploaded
+      :uploaded,
+      :transmission_id
     ])
     |> validate_required([
       :activity_date,
@@ -74,7 +76,8 @@ defmodule Elixpeer.Torrent do
       :size_when_done,
       :status,
       :upload_ratio,
-      :uploaded
+      :uploaded,
+      :transmission_id
     ])
     |> Ecto.Changeset.put_assoc(:trackers, parse_trackers(params))
   end

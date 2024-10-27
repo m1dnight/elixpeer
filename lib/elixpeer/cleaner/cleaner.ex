@@ -42,9 +42,12 @@ defmodule Elixpeer.Cleaner do
       nil
     else
       Logger.warning("deleting torrent  '#{torrent.name}' (#{torrent.id})")
-      Transmission.remove_torrent(torrent.id, true)
+
+      Transmission.remove_torrent([torrent.transmission_id], true)
       torrent
     end
+  catch
+    :exit, _ -> nil
   end
 
   #############################################################################

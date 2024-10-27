@@ -125,7 +125,8 @@ defmodule Elixpeer.Torrents do
       status: parse_status(torrent_map),
       upload_ratio: torrent_map.uploadRatio * 1.0,
       uploaded: torrent_map.uploadedEver,
-      trackers: parse_trackers(torrent_map)
+      trackers: parse_trackers(torrent_map),
+      transmission_id: torrent_map.id
     }
   end
 

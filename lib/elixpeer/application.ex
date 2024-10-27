@@ -18,20 +18,23 @@ defmodule Elixpeer.Application do
       {Finch, name: Elixpeer.Finch},
       # Start a worker by calling: Elixpeer.Worker.start_link(arg)
       # {Elixpeer.Worker, arg},
-      # Start to serve requests, typically the last entry
-      ElixpeerWeb.Endpoint,
+      %{
+        id: Transmission,
+        start: {Transmission, :start_link, transmission_arguments()}
+      },
       %{
         id: Elixpeer.TransmissionConnection,
         start:
           {Elixpeer.TransmissionConnection, :start_link,
            [[], [name: Elixpeer.TransmissionConnection]]}
       },
+      ElixpeerWeb.Endpoint,
       Elixpeer.Cleaner.Worker
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
-    opts = [strategy: :one_for_one, name: Elixpeer.Supervisor]
+    opts = [strategy: :rest_for_one, name: Elixpeer.Supervisor]
     Supervisor.start_link(children, opts)
   end
 
@@ -41,5 +44,28 @@ defmodule Elixpeer.Application do
   def config_change(changed, _new, removed) do
     ElixpeerWeb.Endpoint.config_change(changed, removed)
     :ok
+  end
+
+  # returns the arguments to connect to transmission
+  @spec transmission_arguments() :: [String.t()]
+  defp transmission_arguments do
+    credentials = Application.get_env(:elixpeer, :credentials, %{})
+
+    args = [
+      credentials.host,
+      credentials.username,
+      credentials.password
+    ]
+
+    args
+    |> Enum.each(fn arg ->
+      case arg do
+        nil -> raise "Missing transmission argument"
+        "" -> raise "Missing transmission argument"
+        _ -> arg
+      end
+    end)
+
+    args
   end
 end

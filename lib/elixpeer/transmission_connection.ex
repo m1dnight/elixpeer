@@ -9,7 +9,6 @@ defmodule Elixpeer.TransmissionConnection do
   use GenServer
 
   alias Elixpeer.PubSub
-  alias Elixpeer.Torrent
   alias Elixpeer.Torrents
 
   require Logger
@@ -23,9 +22,6 @@ defmodule Elixpeer.TransmissionConnection do
 
   @impl true
   def init(state) do
-    # start the transmission api
-    {:ok, _pid} = apply(Transmission, :start_link, transmission_arguments())
-
     # Schedule work to be performed on start
     schedule_sync(0)
 
@@ -91,32 +87,23 @@ defmodule Elixpeer.TransmissionConnection do
   #############################################################################
   # Helpers
 
-  # schedules the next sync task
-  @spec schedule_sync(integer()) :: :ok
-  defp schedule_sync(delay \\ Application.get_env(:elixpeer, :refresh_rate_ms)) do
-    if Application.get_env(:elixpeer, :refresh, false) do
-      Process.send_after(self(), :run_sync, delay)
-    end
-
-    :ok
-  end
-
-  # fetches torrents and updates the database
-  defp do_sync do
-    # update the torrentlist
-    {time, new_torrents} =
-      Measure.measure(fn ->
-        store_torrents()
-      end)
-
-    Logger.debug("inserted all torrents in #{time} seconds")
-
-    # send the torrents back
-    GenServer.cast(__MODULE__, {:inserted_torrents, new_torrents})
-  end
-
-  defp store_torrents do
+  # @doc """
+  # Fetches the torrents from the transmission instance
+  # """
+  @spec fetch_torrents() :: [map()]
+  def fetch_torrents do
     Transmission.get_torrents()
+  catch
+    :exit, _ -> []
+  end
+
+  # @doc """
+  # Fetches the torrents from the instance, and stores them in the database.
+  # Returns a list of %Torrent{} structs
+  # """
+  @spec store_torrents() :: [Torrents.t()]
+  def store_torrents do
+    fetch_torrents()
     |> store_torrents()
   end
 
@@ -133,26 +120,27 @@ defmodule Elixpeer.TransmissionConnection do
     end)
   end
 
-  # returns the arguments to connect to transmission
-  @spec transmission_arguments() :: [String.t()]
-  defp transmission_arguments do
-    credentials = Application.get_env(:elixpeer, :credentials, %{})
+  # schedules the next sync task
+  @spec schedule_sync(integer()) :: :ok
+  defp schedule_sync(delay \\ Application.get_env(:elixpeer, :refresh_rate_ms)) do
+    if Application.get_env(:elixpeer, :refresh, false) do
+      Process.send_after(self(), :run_sync, delay)
+    end
 
-    args = [
-      credentials.host,
-      credentials.username,
-      credentials.password
-    ]
+    :ok
+  end
 
-    args
-    |> Enum.each(fn arg ->
-      case arg do
-        nil -> raise "Missing transmission argument"
-        "" -> raise "Missing transmission argument"
-        _ -> arg
-      end
-    end)
+  # @doc """
+  # Fetches torrents and updates the database
+  # and replies with the new torrents.
+  # """
+  defp do_sync do
+    # update the torrentlist
+    {time, new_torrents} = Measure.measure(&store_torrents/0)
 
-    args
+    Logger.debug("inserted all torrents in #{time} seconds")
+
+    # send the torrents back
+    GenServer.cast(__MODULE__, {:inserted_torrents, new_torrents})
   end
 end
