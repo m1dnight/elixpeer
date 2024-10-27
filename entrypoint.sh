@@ -6,6 +6,6 @@ bin="/app/bin/server"
 echo "running migrations"
 $bin eval "Elixpeer.Release.migrate"
 
-# start the elixir application
-echo "starting application"
-exec "$bin"
+# # start the elixir application
+# echo "starting application"
+# exec "$bin"
