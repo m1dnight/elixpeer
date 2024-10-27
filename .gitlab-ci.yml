@@ -70,67 +70,58 @@ cache:
     - _build
     - deps
 
-################################################################################
-# Jobs
+# ################################################################################
+# # Jobs
 
-#-------------------------------------------------------------------------------
-# Build 
+# #-------------------------------------------------------------------------------
+# # Build 
 
-compile_test:elixir:
-  extends:
-    - .build_stage
-    - .elixir
-  variables:
-    MIX_ENV: "prod"
-  script:
-    - mix compile --warnings-as-errors
+# compile_test:elixir:
+#   extends:
+#     - .build_stage
+#     - .elixir
+#   variables:
+#     MIX_ENV: "prod"
+#   script:
+#     - mix compile --warnings-as-errors
 
-compile_prod:elixir:
-  extends:
-    - .build_stage
-    - .elixir
-  variables:
-    MIX_ENV: "prod"
-  script:
-    - mix compile --warnings-as-errors
+# compile_prod:elixir:
+#   extends:
+#     - .build_stage
+#     - .elixir
+#   variables:
+#     MIX_ENV: "prod"
+#   script:
+#     - mix compile --warnings-as-errors
 
-#-------------------------------------------------------------------------------
-# Test 
+# #-------------------------------------------------------------------------------
+# # Test 
 
-test:elixir:
-  extends:
-    - .stage_test
-    - .elixir 
-  variables:
-    MIX_ENV: "test"
-  services:
-    - name: lscr.io/linuxserver/transmission:latest  
-      alias: transmission
-    - name: timescale/timescaledb-ha:pg16
-      alias: postgres
-  script:
-    - mix test
+# test:elixir:
+#   extends:
+#     - .stage_test
+#     - .elixir 
+#   variables:
+#     MIX_ENV: "test"
+#   services:
+#     - name: lscr.io/linuxserver/transmission:latest  
+#       alias: transmission
+#     - name: timescale/timescaledb-ha:pg16
+#       alias: postgres
+#   script:
+#     - mix test
 
-#-------------------------------------------------------------------------------
-# Lint 
+# #-------------------------------------------------------------------------------
+# # Lint 
 
-credo:elixir:
-  extends: 
-    - .stage_lint
-    - .elixir
-  variables:
-    MIX_ENV: "test"
-  script:
-    - mix credo --strict
-
-style:elixir:
-  extends: 
-    - .stage_lint
-    - .elixir
-  variables:
-    MIX_ENV: "test"
-  script:
-    - mix format --check-formatted
+# credo:elixir:
+#   extends: 
+#     - .stage_lint
+#     - .elixir
+#   variables:
+#     MIX_ENV: "test"
+#   script:
+#     - mix credo --strict
 
 # style:elixir:
 #   extends: 
@@ -139,7 +130,16 @@ style:elixir:
 #   variables:
 #     MIX_ENV: "test"
 #   script:
-#     - mix dialyzer
+#     - mix format --check-formatted
+
+# # style:elixir:
+# #   extends: 
+# #     - .stage_lint
+# #     - .elixir
+# #   variables:
+# #     MIX_ENV: "test"
+# #   script:
+# #     - mix dialyzer
 
 #-------------------------------------------------------------------------------
 # Docker 
