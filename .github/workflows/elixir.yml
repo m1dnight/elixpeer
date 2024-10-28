@@ -7,8 +7,6 @@ jobs:
     strategy:
       matrix:
         mix_env: ["prod", "dev"]
-    env:
-      MIX_ENV: "prod"
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repository to the runner
@@ -18,8 +16,8 @@ jobs:
         with:
           otp-version: "27.1"
           elixir-version: "1.17"
-      - run: mix deps.get --only ${{matrix.mix_env}}
-      - run: mix compile --warnings-as-errors
+      - run: MIX_ENV=${{matrix.mix_env}} mix deps.get --only ${{matrix.mix_env}}
+      - run: MIX_ENV=${{matrix.mix_env}} mix compile --warnings-as-errors
       - name: cache build and deps
         uses: actions/cache@v3
         with:
@@ -52,5 +50,5 @@ jobs:
             ~/work/elixpeer/elixpeer/_build
       - run: ls -la deps/
       - run: ls -la _build/
-      - run: mix credo --strict
-      - run: mix format --check-formatted
+      - run: MIX_ENV=${{matrix.mix_env}} mix credo --strict
+      - run: MIX_ENV=${{matrix.mix_env}} mix format --check-formatted
