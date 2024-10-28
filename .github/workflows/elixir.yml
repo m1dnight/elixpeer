@@ -3,6 +3,11 @@ run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
 on: [push]
 jobs:
   compile:
-    runs-on: elixir:1.17-otp-26
+    env: 
+      MIX_ENV: "prod"
+    runs-on: elixir:1.17
     steps:
-      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event." 
+      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+      - run: mix local.hex --force
+      - run: mix local.rebar --force
+      - run: mix deps.get --only $MIX_ENV
