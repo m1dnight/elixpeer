@@ -2,7 +2,7 @@ name: GitHub Actions Demo
 run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
 on: [push]
 jobs:
-  setup:
+  compile:
     name: Setup the environment
     env:
       MIX_ENV: "prod"
@@ -17,12 +17,19 @@ jobs:
           elixir-version: "1.17"
       - run: mix deps.get --only $MIX_ENV
       - run: mix compile --warnings-as-errors
-  compile:
-    name: Compile
-    needs: setup
+
+  lint:
+    name: Setup the environment
     env:
       MIX_ENV: "prod"
     runs-on: ubuntu-latest
     steps:
-      - run: mix deps.get --only $MIX_ENV
-      - run: mix compile --warnings-as-errors
+      - name: Check out the repository to the runner
+        uses: actions/checkout@v4
+      - name: Run a script
+        uses: erlef/setup-beam@v1
+        with:
+          otp-version: "27.1"
+          elixir-version: "1.17"
+      - run: mix credo --strict
+      - run: mix format --check-formatted
