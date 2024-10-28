@@ -22,7 +22,7 @@ jobs:
       - run: mix compile --warnings-as-errors
 
   lint:
-    name: Setup the environment
+    name: Check formatting and style
     needs: [compile]
     env:
       MIX_ENV: "prod"
