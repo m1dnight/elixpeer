@@ -66,6 +66,8 @@ jobs:
     strategy:
       matrix:
         mix_env: ["test"]
+    env:
+      TRANSMISSION_TEST_HOST: "http://localhost:9091/transmission/rpc"
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repository to the runner
