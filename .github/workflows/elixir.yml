@@ -84,6 +84,5 @@ jobs:
           path: |
             ~/work/elixpeer/elixpeer/deps 
             ~/work/elixpeer/elixpeer/_build
-      - run: curl "http://transmission:9091/transmission/rpc"
-      # - run: MIX_ENV=${{matrix.mix_env}} mix test
-      # - run: MIX_ENV=${{matrix.mix_env}} mix format --check-formatted
+      - run: MIX_ENV=${{matrix.mix_env}} mix test
+      - run: MIX_ENV=${{matrix.mix_env}} mix format --check-formatted
