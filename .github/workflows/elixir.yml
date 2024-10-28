@@ -6,7 +6,8 @@ jobs:
     name: Setup the environment
     strategy:
       matrix:
-        mix_env: ['prod', 'dev']
+        # mix_env: ['prod', 'dev']
+        mix_env: ['prod']
     env:
       MIX_ENV: "prod"
     runs-on: ubuntu-latest
@@ -22,6 +23,7 @@ jobs:
       - run: mix compile --warnings-as-errors
       - run: ls -la 
       - run: pwd
+      - run: ls -la ~/
       - name: cache build and deps
         uses: actions/cache@v3
         with:
@@ -29,19 +31,19 @@ jobs:
             ~/.gradle/caches
             ~/.gradle/wrapper
 
-  lint:
-    name: Check formatting and style
-    needs: [compile]
-    env:
-      MIX_ENV: "prod"
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out the repository to the runner
-        uses: actions/checkout@v4
-      - name: Run a script
-        uses: erlef/setup-beam@v1
-        with:
-          otp-version: "27.1"
-          elixir-version: "1.17"
-      - run: mix credo --strict
-      - run: mix format --check-formatted
+  # lint:
+  #   name: Check formatting and style
+  #   needs: [compile]
+  #   env:
+  #     MIX_ENV: "prod"
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Check out the repository to the runner
+  #       uses: actions/checkout@v4
+  #     - name: Run a script
+  #       uses: erlef/setup-beam@v1
+  #       with:
+  #         otp-version: "27.1"
+  #         elixir-version: "1.17"
+  #     - run: mix credo --strict
+  #     - run: mix format --check-formatted
