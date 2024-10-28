@@ -62,7 +62,7 @@ jobs:
         image: lscr.io/linuxserver/transmission:latest  
         ports: ['9091:9091']
     name: Run tests
-    # needs: [compile]
+    needs: [compile]
     strategy:
       matrix:
         mix_env: ["test"]
