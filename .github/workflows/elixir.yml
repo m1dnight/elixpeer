@@ -1,0 +1,88 @@
+name: Compile, test, lint, and deploy
+run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
+on: [push]
+jobs:
+  compile:
+    name: Setup the environment
+    strategy:
+      matrix:
+        mix_env: ["prod", "dev", "test"]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository to the runner
+        uses: actions/checkout@v4
+      - name: Run a script
+        uses: erlef/setup-beam@v1
+        with:
+          otp-version: "27.1"
+          elixir-version: "1.17"
+      - run: MIX_ENV=${{matrix.mix_env}} mix deps.get --only ${{matrix.mix_env}}
+      - run: MIX_ENV=${{matrix.mix_env}} mix compile --warnings-as-errors
+      - name: cache build and deps
+        uses: actions/cache@v3
+        with:
+          key: ${{ runner.os }}-build-${{ matrix.mix_env }}-${{ hashFiles('mix.lock') }}
+          path: |
+            ~/work/elixpeer/elixpeer/deps 
+            ~/work/elixpeer/elixpeer/_build
+
+  lint:
+    name: Lint code
+    needs: [compile]
+    strategy:
+      matrix:
+        mix_env: ["dev"]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository to the runner
+        uses: actions/checkout@v4
+      - name: Run a script
+        uses: erlef/setup-beam@v1
+        with:
+          otp-version: "27.1"
+          elixir-version: "1.17"
+      - name: use cache from build
+        uses: actions/cache@v3
+        with:
+          key: ${{ runner.os }}-build-${{ matrix.mix_env }}-${{ hashFiles('mix.lock') }}
+          path: |
+            ~/work/elixpeer/elixpeer/deps 
+            ~/work/elixpeer/elixpeer/_build
+      - run: MIX_ENV=${{matrix.mix_env}} mix credo --strict
+      - run: MIX_ENV=${{matrix.mix_env}} mix format --check-formatted
+
+  test:
+    services:
+      db:
+        image: timescale/timescaledb-ha:pg16
+        ports: ['5432:5432']
+        env:
+          POSTGRES_PASSWORD: postgres
+      transmission:
+        image: lscr.io/linuxserver/transmission:latest  
+        ports: ['9091:9091']
+    name: Run tests
+    needs: [compile]
+    strategy:
+      matrix:
+        mix_env: ["test"]
+    env:
+      TRANSMISSION_TEST_HOST: "http://localhost:9091/transmission/rpc"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository to the runner
+        uses: actions/checkout@v4
+      - name: Run a script
+        uses: erlef/setup-beam@v1
+        with:
+          otp-version: "27.1"
+          elixir-version: "1.17"
+      - name: use cache from build
+        uses: actions/cache@v3
+        with:
+          key: ${{ runner.os }}-build-${{ matrix.mix_env }}-${{ hashFiles('mix.lock') }}
+          path: |
+            ~/work/elixpeer/elixpeer/deps 
+            ~/work/elixpeer/elixpeer/_build
+      - run: MIX_ENV=${{matrix.mix_env}} mix test
+      - run: MIX_ENV=${{matrix.mix_env}} mix format --check-formatted
