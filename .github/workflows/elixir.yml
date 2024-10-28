@@ -59,7 +59,7 @@ jobs:
     # Additional services can be defined here if required.
     services:
       db:
-        image: postgres:17
+        image: timescale/timescaledb-ha:pg16
         ports: ['5432:5432']
         env:
           POSTGRES_PASSWORD: postgres
@@ -68,6 +68,9 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+      transmission:
+        image: lscr.io/linuxserver/transmission:latest  
+        ports: ['9091:9091']
     name: Check formatting and style
     needs: [compile]
     strategy:
