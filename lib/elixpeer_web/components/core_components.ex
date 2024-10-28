@@ -19,7 +19,7 @@ defmodule ElixpeerWeb.CoreComponents do
 
   alias Phoenix.HTML.Form
   alias Phoenix.LiveView.JS
-  import ElixpeerWeb.Gettext
+  use Gettext, backend: ElixpeerWeb.Gettext
 
   @doc """
   Renders a modal.
