@@ -31,7 +31,7 @@ jobs:
     needs: [compile]
     strategy:
       matrix:
-        mix_env: ["prod"]
+        mix_env: ["dev"]
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repository to the runner
