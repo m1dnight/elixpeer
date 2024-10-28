@@ -6,8 +6,14 @@ jobs:
     env: 
       MIX_ENV: "prod"
     runs-on: ubuntu-latest
+    uses: erlef/setup-beam@v1
     steps:
-      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
-      - run: mix local.hex --force
-      - run: mix local.rebar --force
+      - name: Check out the repository to the runner
+        uses: actions/checkout@v4  
+      - name: Run a script
+        uses: erlef/setup-beam@v1
+        with:
+          otp-version: '27.1'
+          elixir-version: '1.17'
       - run: mix deps.get --only $MIX_ENV
+      - run: mix compile --warnings-as-errors
