@@ -5,7 +5,7 @@ jobs:
   compile:
     env: 
       MIX_ENV: "prod"
-    runs-on: elixir:1.17
+    runs-on: ubuntu-latest
     steps:
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
       - run: mix local.hex --force
