@@ -20,6 +20,8 @@ jobs:
           elixir-version: "1.17"
       - run: mix deps.get --only ${{matrix.mix_env}}
       - run: mix compile --warnings-as-errors
+      - run: ls -la 
+      - run: pwd 
 
   lint:
     name: Check formatting and style
