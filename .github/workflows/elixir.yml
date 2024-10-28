@@ -20,9 +20,6 @@ jobs:
           elixir-version: "1.17"
       - run: mix deps.get --only ${{matrix.mix_env}}
       - run: mix compile --warnings-as-errors
-      - run: ls -la
-      - run: pwd
-      - run: ls -la ~/
       - name: cache build and deps
         uses: actions/cache@v3
         with:
@@ -53,5 +50,7 @@ jobs:
           path: |
             ~/work/elixpeer/elixpeer/deps 
             ~/work/elixpeer/elixpeer/_build
+      - run: ls -la deps/
+      - run: ls -la _build/
       - run: mix credo --strict
       - run: mix format --check-formatted
