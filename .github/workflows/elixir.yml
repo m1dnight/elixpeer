@@ -19,7 +19,7 @@ jobs:
       - run: MIX_ENV=${{matrix.mix_env}} mix deps.get --only ${{matrix.mix_env}}
       - run: MIX_ENV=${{matrix.mix_env}} mix compile --warnings-as-errors
       - name: cache build and deps
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           key: ${{ runner.os }}-build-${{ matrix.mix_env }}-${{ hashFiles('mix.lock') }}
           path: |
@@ -42,7 +42,7 @@ jobs:
           otp-version: "27.1"
           elixir-version: "1.17"
       - name: use cache from build
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           key: ${{ runner.os }}-build-${{ matrix.mix_env }}-${{ hashFiles('mix.lock') }}
           path: |
@@ -78,7 +78,7 @@ jobs:
           otp-version: "27.1"
           elixir-version: "1.17"
       - name: use cache from build
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           key: ${{ runner.os }}-build-${{ matrix.mix_env }}-${{ hashFiles('mix.lock') }}
           path: |
