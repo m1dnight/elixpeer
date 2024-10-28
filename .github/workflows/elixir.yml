@@ -6,8 +6,7 @@ jobs:
     name: Setup the environment
     strategy:
       matrix:
-        # mix_env: ['prod', 'dev']
-        mix_env: ['prod']
+        mix_env: ['prod', 'dev']
     env:
       MIX_ENV: "prod"
     runs-on: ubuntu-latest
@@ -27,23 +26,32 @@ jobs:
       - name: cache build and deps
         uses: actions/cache@v3
         with:
+          key: ${{ runner.os }}-build-${{ matrix.mix_env }}-${{ hashFiles('mix.lock') }}
           path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
+            ~/work/elixpeer/elixpeer/deps 
+            ~/work/elixpeer/elixpeer/_build 
 
-  # lint:
-  #   name: Check formatting and style
-  #   needs: [compile]
-  #   env:
-  #     MIX_ENV: "prod"
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Check out the repository to the runner
-  #       uses: actions/checkout@v4
-  #     - name: Run a script
-  #       uses: erlef/setup-beam@v1
-  #       with:
-  #         otp-version: "27.1"
-  #         elixir-version: "1.17"
-  #     - run: mix credo --strict
-  #     - run: mix format --check-formatted
+  lint:
+    name: Check formatting and style
+    needs: [compile]
+    strategy:
+      matrix:
+        mix_env: ['prod']
+    runs-on: ubuntu-latest
+    steps:
+      - name: use cache from build
+        uses: actions/cache@v3
+        with:
+          key: ${{ runner.os }}-build-${{ matrix.mix_env }}-${{ hashFiles('mix.lock') }}
+          path: |
+            ~/work/elixpeer/elixpeer/deps 
+            ~/work/elixpeer/elixpeer/_build       
+      - name: Check out the repository to the runner
+        uses: actions/checkout@v4
+      - name: Run a script
+        uses: erlef/setup-beam@v1
+        with:
+          otp-version: "27.1"
+          elixir-version: "1.17"
+      - run: mix credo --strict
+      - run: mix format --check-formatted
