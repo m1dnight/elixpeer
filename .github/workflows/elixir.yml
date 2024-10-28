@@ -23,6 +23,7 @@ jobs:
 
   lint:
     name: Setup the environment
+    needs: [compile]
     env:
       MIX_ENV: "prod"
     runs-on: ubuntu-latest
