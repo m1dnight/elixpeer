@@ -27,6 +27,12 @@ defmodule Elixpeer.Torrents do
     |> Repo.preload(:trackers)
   end
 
+  @spec deleted :: Torrent.t()
+  def deleted do
+    from(t in Torrent, where: t.status == :deleted)
+    |> Repo.all()
+  end
+
   @doc """
   Fetches the activities for the given torrent.
   """
@@ -35,6 +41,19 @@ defmodule Elixpeer.Torrents do
     torrent
     |> Repo.preload(:torrent_activities, force: true)
     |> Map.get(:torrent_activities)
+  end
+
+  #############################################################################
+  # Update
+
+  @doc """
+  Mark a torrent as being deleted.
+  """
+  @spec delete(Torrent.t()) :: Torrent.t()
+  def delete(torrent) do
+    torrent
+    |> Ecto.Changeset.change(status: :deleted)
+    |> Repo.update!()
   end
 
   #############################################################################

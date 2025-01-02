@@ -30,7 +30,8 @@ defmodule Elixpeer.Torrent do
         :queued_to_download,
         :downloading,
         :queued_to_seed,
-        :seeding
+        :seeding,
+        :deleted
       ]
 
     field :upload_ratio, :float

@@ -44,6 +44,7 @@ defmodule Elixpeer.Cleaner do
       Logger.warning("deleting torrent  '#{torrent.name}' (#{torrent.id})")
 
       Transmission.remove_torrent([torrent.transmission_id], true)
+      Elixpeer.Torrents.delete(torrent)
       torrent
     end
   catch
