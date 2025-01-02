@@ -9,6 +9,7 @@ defmodule Elixpeer.TransmissionConnection do
   use GenServer
 
   alias Elixpeer.PubSub
+  alias Elixpeer.Torrent
   alias Elixpeer.Torrents
 
   require Logger
@@ -101,7 +102,7 @@ defmodule Elixpeer.TransmissionConnection do
   # Fetches the torrents from the instance, and stores them in the database.
   # Returns a list of %Torrent{} structs
   # """
-  @spec store_torrents() :: [Torrents.t()]
+  @spec store_torrents() :: [Torrent.t()]
   def store_torrents do
     fetch_torrents()
     |> store_torrents()

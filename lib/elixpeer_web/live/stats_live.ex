@@ -2,7 +2,11 @@ defmodule ElixpeerWeb.StatsLive do
   use ElixpeerWeb, :live_view
 
   alias Elixpeer.Statistics
+  alias Elixpeer.Torrents
   alias Phoenix.LiveView.AsyncResult
+
+  import Elixpeer.TorrentsLive.Torrent
+  import ElixpeerWeb.Components.TorrentModal
 
   require Logger
 
@@ -10,12 +14,9 @@ defmodule ElixpeerWeb.StatsLive do
   def mount(_params, _session, socket) do
     socket =
       socket
+      |> assign(:deleted, Torrents.deleted())
       |> assign(:activity, AsyncResult.loading())
       |> start_async(:activity, fn -> Statistics.torrent_activities(interval_days: 90) end)
-
-    # |> assign_async(:activity, fn ->
-    #   {:ok, %{activity: Statistics.torrent_activities()}}
-    # end)
 
     {:ok, socket}
   end
@@ -54,5 +55,38 @@ defmodule ElixpeerWeb.StatsLive do
       |> push_event("update-volume-chart", %{data_series: [downloaded_data, uploaded_data]})
 
     {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("request_modal_data", %{"torrent_id" => torrent_id}, socket) do
+    modal_content = modal_data(torrent_id)
+
+    event_name = "update-torrent-chart-#{torrent_id}"
+
+    socket =
+      socket
+      |> push_event(event_name, %{data_series: modal_content.data_series})
+
+    {:noreply, socket}
+  end
+
+  #############################################################################
+  # Helpers
+
+  defp modal_data(torrent_id) do
+    torrent = Torrents.get(torrent_id)
+    activity = Elixpeer.Statistics.torrent_activities_for(torrent_id, 360)
+
+    upload_data = Enum.map(activity, &[&1.bucket, Decimal.to_float(&1.uploaded)])
+
+    download_data = Enum.map(activity, &[&1.bucket, Decimal.to_float(&1.downloaded)])
+
+    %{
+      torrent: torrent,
+      data_series: [
+        %{name: "Uploaded", data: upload_data},
+        %{name: "Downloaded", data: download_data}
+      ]
+    }
   end
 end

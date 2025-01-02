@@ -58,8 +58,8 @@ defmodule Elixpeer.Statistics do
   @doc """
   Get the aggregated up- and download speeds of a specific torrent for the last 2 days.
   """
-  @spec torrent_activities_for(integer()) :: [statistic_bucket]
-  def torrent_activities_for(torrent_id) do
+  @spec torrent_activities_for(integer(), integer()) :: [statistic_bucket]
+  def torrent_activities_for(torrent_id, days \\ 60) do
     query = """
     SELECT time_bucket_gapfill('1 day', bucket)     AS bucket_total,
           COALESCE(SUM(uploaded), 0.0)              AS uploaded,
@@ -67,7 +67,7 @@ defmodule Elixpeer.Statistics do
           COALESCE(SUM(uploaded) * 8 / 3600, 0.0)   AS upload_speed_bps,
           COALESCE(SUM(downloaded) * 8 / 3600, 0.0) AS download_speed_bps
     FROM activity_per_day_per_torrent
-    WHERE bucket > NOW() - INTERVAL '60 day'
+    WHERE bucket > NOW() - INTERVAL '#{days} day'
       AND bucket <= NOW()
       AND torrent_id = #{torrent_id}
     GROUP BY bucket_total;
