@@ -132,6 +132,12 @@ defmodule ElixpeerWeb.TorrentsLive do
 
         :newest_first ->
           [& &1.added_date, {:desc, NaiveDateTime}]
+
+        :uploaded_desc ->
+          [& &1.uploaded, :desc]
+
+        :downloaded_desc ->
+          [& &1.downloaded, :desc]
       end
 
     apply(Enum, :sort_by, [torrents | sorter])

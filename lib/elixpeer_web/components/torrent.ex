@@ -34,18 +34,28 @@ defmodule Elixpeer.TorrentsLive.Torrent do
         </span>
         <!-- Age -->
         <span class="bg-blue-100 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-blue-900">
+          <%= Calendar.strftime(@torrent.added_date, "%x") %> (<%= Date.diff(
+            DateTime.utc_now(),
+            @torrent.added_date
+          ) %> days)
         </span>
         <!-- Ratio  and actions-->
         <span class="bg-blue-100 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-blue-900 ">
-          <%= Size.humanize!(@torrent.size_when_done) %>
+          ∑ <%= Size.humanize!(@torrent.size_when_done) %>
         </span>
         <!-- Ratio  and actions-->
         <span class="bg-blue-100 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-blue-900 ">
-          <%= Float.round(@torrent.upload_ratio, 2) %>
+          % <%= Float.round(@torrent.upload_ratio, 2) %>
+        </span>
+        <span class="bg-blue-100 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-blue-900 ">
+          ↑ <%= Size.humanize!(@torrent.uploaded) %>
+        </span>
+        <span class="bg-blue-100 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-blue-900 ">
+          ↓ <%= Size.humanize!(@torrent.downloaded) %>
         </span>
       </div>
 
-      <div class="grow text-right font-light">
+      <div :if={not @read_only} class="grow text-right font-light">
         <!-- Trash -->
         <button
           phx-click="delete_torrent"
