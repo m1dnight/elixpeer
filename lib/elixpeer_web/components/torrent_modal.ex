@@ -35,6 +35,9 @@ defmodule ElixpeerWeb.Components.TorrentModal do
             <.pill>
               <%= Size.humanize!(@torrent.size_when_done) %>
             </.pill>
+            <.pill :for={t <- @torrent.trackers} type="warn">
+              <%= t.sitename %>
+            </.pill>
           </div>
         </div>
         <!-- Chart -->

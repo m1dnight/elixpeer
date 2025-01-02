@@ -1,14 +1,23 @@
+<h1 class="text-4xl mb-4">
+  Statistics
+</h1>
 <div :if={@activity.loading}>Loading...</div>
 <div :if={@activity.ok?}>
   <div id="speed-chart" phx-hook="SpeedChart"></div>
   <div id="volume-chart" phx-hook="VolumeChart"></div>
 </div>
+<h1 class="text-4xl mb-4">
+  Deleted torrents
+</h1>
 <div>
-  <h1>Deleted</h1>
-  <div>
-    <%= for t <- @deleted do %>
-      <.torrent_modal id={"torrent-modal-#{t.id}"} torrent={t} />
-      <.torrent id={"torrent-#{t.id}"} torrent={t} read_only={true} />
-    <% end %>
-  </div>
+  <%= for t <- @deleted do %>
+    <.torrent_modal id={"torrent-modal-#{t.id}"} torrent={t} />
+    <.torrent
+      id={"torrent-#{t.id}"}
+      torrent={t}
+      read_only={true}
+      progress_bar={false}
+      speeds={false}
+    />
+  <% end %>
 </div>

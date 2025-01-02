@@ -31,6 +31,7 @@ defmodule Elixpeer.Torrents do
   def deleted do
     from(t in Torrent, where: t.status == :deleted)
     |> Repo.all()
+    |> Repo.preload(:trackers)
   end
 
   @doc """
