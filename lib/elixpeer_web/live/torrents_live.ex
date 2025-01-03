@@ -16,7 +16,7 @@ defmodule ElixpeerWeb.TorrentsLive do
 
     {:ok,
      assign(socket,
-       torrents: [],
+       torrents: Elixpeer.TransmissionConnection.get_torrents(),
        ordering: :active_first,
        modal_content: nil
      )}

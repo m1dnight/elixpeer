@@ -3,7 +3,7 @@ import Config
 #############################################################################
 # Transmission Login
 config :elixpeer,
-  refresh_rate_ms: 1000,
+  refresh_rate_ms: 100_000,
   refresh: true,
   clean_rate_ms: 1000_000,
   dry_run: true,
@@ -27,7 +27,7 @@ config :elixpeer, Elixpeer.Repo,
   port: 5432,
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
-  log: false,
+  log: :debug,
   pool_size: 10
 
 #############################################################################
