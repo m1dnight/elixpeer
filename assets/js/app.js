@@ -32,6 +32,7 @@ let Hooks = {};
 
 Hooks.Chart = {
   mounted() {
+    console.log("mounted")
     // build the options for this chart
     var options = Object.assign({}, defaultOptions);
     options.chart = Object.assign(defaultChartOptions, {type: "bar", stacked: false});
@@ -44,6 +45,8 @@ Hooks.Chart = {
     chart.render();
 
     this.handleEvent(`update-${this.el.id}`, (data) => {
+      console.log("evt")
+
       // data is in the form of:
       // { data_series: [{name: name, data: [[x, y]]}]}
       console.log("updating chart!");
@@ -55,6 +58,7 @@ Hooks.Chart = {
 
 Hooks.VolumeChart = {
   mounted() {
+    console.log("mounted")
     // build the options for this chart
     var options = Object.assign({}, defaultOptions);
     options.chart = Object.assign({}, defaultChartOptions);
@@ -68,6 +72,8 @@ Hooks.VolumeChart = {
     chart.render();
 
     this.handleEvent(`update-${this.el.id}`, (data) => {
+      console.log("evt")
+
       // data is in the form of:
       // { data_series: [{name: name, data: [[x, y]]}]}
       chart.updateSeries(data.data_series);
@@ -77,6 +83,7 @@ Hooks.VolumeChart = {
 
 Hooks.SpeedChart = {
   mounted() {
+    console.log("mounted")
     // build the options for this chart
     var options = Object.assign({}, defaultOptions);
     options.chart = Object.assign({}, defaultChartOptions);
@@ -90,6 +97,7 @@ Hooks.SpeedChart = {
     chart.render();
 
     this.handleEvent(`update-${this.el.id}`, (data) => {
+      console.log("evt")
       // data is in the form of:
       // { data_series: [{name: name, data: [[x, y]]}]}
       console.log("updating chart!");

@@ -11,11 +11,11 @@
 </h1>
 <div>
   <%= for t <- @deleted do %>
-    <.torrent_modal id={"torrent-modal-#{t.id}"} torrent={t} />
-    <.torrent
+    <.live_component
       id={"torrent-#{t.id}"}
       torrent={t}
       read_only={true}
+      module={Elixpeer.TorrentsLive.Torrent}
       progress_bar={false}
       speeds={false}
     />

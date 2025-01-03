@@ -7,9 +7,6 @@ defmodule ElixpeerWeb.TorrentsLive do
 
   require Logger
 
-  import Elixpeer.TorrentsLive.Torrent
-  import ElixpeerWeb.Components.TorrentModal
-
   def mount(_params, _session, socket) do
     # subscribe for updates on the torrentlist
     PubSub.subscribe(Elixpeer.PubSub, "torrents")
@@ -82,7 +79,17 @@ defmodule ElixpeerWeb.TorrentsLive do
     {:noreply, socket}
   end
 
-  def handle_info({:new_torrents, torrents}, socket) do
+  def handle_info({:new_torrent, torrent}, socket) do
+    torrents =
+      socket.assigns.torrents
+      |> Enum.map(fn t ->
+        if t.id == torrent.id do
+          torrent
+        else
+          t
+        end
+      end)
+
     socket =
       socket
       |> assign(torrents: torrents)
@@ -122,7 +129,7 @@ defmodule ElixpeerWeb.TorrentsLive do
     sorter =
       case order do
         :ratio_desc ->
-          [& &1.upload_ratio, :desc]
+          [&{&1.upload_ratio, &1.id}, :desc]
 
         :active_first ->
           [&(&1.rate_download + &1.rate_upload), :desc]
@@ -140,6 +147,6 @@ defmodule ElixpeerWeb.TorrentsLive do
           [& &1.downloaded, :desc]
       end
 
-    apply(Enum, :sort_by, [torrents | sorter])
+    apply(Enum, :sort_by, [Enum.sort_by(torrents, & &1.id) | sorter])
   end
 end

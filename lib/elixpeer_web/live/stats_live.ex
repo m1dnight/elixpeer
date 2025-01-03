@@ -5,9 +5,6 @@ defmodule ElixpeerWeb.StatsLive do
   alias Elixpeer.Torrents
   alias Phoenix.LiveView.AsyncResult
 
-  import Elixpeer.TorrentsLive.Torrent
-  import ElixpeerWeb.Components.TorrentModal
-
   require Logger
 
   @impl true

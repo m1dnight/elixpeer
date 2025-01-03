@@ -71,7 +71,7 @@ defmodule Elixpeer.Torrents do
       %Torrent{}
       |> Torrent.changeset(Map.drop(attrs, [:trackers]))
       |> Repo.insert!(
-        on_conflict: {:replace_all_except, [:id]},
+        on_conflict: {:replace_all_except, [:id, :inserted_at, :updated_at]},
         conflict_target: [:name],
         returning: true
       )
@@ -80,7 +80,7 @@ defmodule Elixpeer.Torrents do
     # upsert the trackers
     torrent =
       torrent
-      |> Torrent.changeset(attrs)
+      |> Torrent.changeset(Map.take(attrs, [:trackers]))
       |> Repo.update!()
 
     # insert the activity

@@ -11,6 +11,16 @@ defmodule Elixpeer.Trackers do
   end
 
   @doc """
+  Inserts the torrent into the database.
+  """
+  @spec insert(map()) :: Tracker.t()
+  def insert(attrs) do
+    %Tracker{}
+    |> Tracker.changeset(attrs)
+    |> Repo.insert!()
+  end
+
+  @doc """
   Inserts the torrent into the database, updating if necessary.
   """
   @spec upsert(map()) :: Tracker.t()
@@ -18,7 +28,7 @@ defmodule Elixpeer.Trackers do
     %Tracker{}
     |> Tracker.changeset(attrs)
     |> Repo.insert!(
-      on_conflict: {:replace_all_except, [:id]},
+      on_conflict: {:replace_all_except, [:id, :inserted_at, :updated_at]},
       conflict_target: [:announce, :scrape, :sitename, :tier],
       returning: true
     )

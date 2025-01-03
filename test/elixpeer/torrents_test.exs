@@ -46,6 +46,7 @@ defmodule Elixpeer.TorrentsTest do
       result2 = Torrents.upsert(@torrent_attrs)
 
       assert result1.id == result2.id
+      assert Torrents.list() == [result1]
     end
 
     test "inserts trackers too" do

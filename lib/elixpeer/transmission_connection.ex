@@ -63,7 +63,7 @@ defmodule Elixpeer.TransmissionConnection do
   # handle the result from the async task with new torrents
   def handle_cast({:inserted_torrents, torrents}, state) do
     # broadcast the changed torrentlist
-    Phoenix.PubSub.broadcast(PubSub, "torrents", {:new_torrents, torrents})
+    # Phoenix.PubSub.broadcast(PubSub, "torrents", {:new_torrents, torrents})
 
     # schedule the next sync
     schedule_sync()
@@ -112,13 +112,13 @@ defmodule Elixpeer.TransmissionConnection do
   @spec store_torrents([map()]) :: [Torrent.t()]
   defp store_torrents(torrent_maps) do
     torrent_maps
-    |> Enum.map(fn torrent_map ->
-      # convert to a map
-      torrent_attrs = Torrents.from_map(torrent_map)
-
-      # insert the trackers
-      Torrents.upsert(torrent_attrs)
+    |> Enum.map(&Torrents.from_map/1)
+    |> Enum.map(&Torrents.upsert/1)
+    |> Enum.map(fn t ->
+      Phoenix.PubSub.broadcast(PubSub, "torrents", {:new_torrent, t})
+      t
     end)
+    |> Enum.into([])
   end
 
   # schedules the next sync task
