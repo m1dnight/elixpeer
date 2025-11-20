@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repository to the runner
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Run a script
         uses: erlef/setup-beam@v1
         with:
@@ -35,7 +35,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repository to the runner
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Run a script
         uses: erlef/setup-beam@v1
         with:
@@ -71,7 +71,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repository to the runner
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Run a script
         uses: erlef/setup-beam@v1
         with:
