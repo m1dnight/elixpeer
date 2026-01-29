@@ -58,7 +58,7 @@ defmodule Elixpeer.MixProject do
       {:transmission, git: "https://github.com/m1dnight/ex_transmission"},
       # {:transmission, path: "/Users/christophe/Documents/Code/ex_transmission"},
       {:propcheck, "~> 1.4", only: [:test, :dev]},
-      {:hackney, "~> 1.20"},
+      {:hackney, "~> 3.0"},
       {:nimble_parsec, "~> 1.4.0"},
       {:size, "~> 0.1.0"},
       {:typed_ecto_schema, "~> 0.4.1", runtime: false}
